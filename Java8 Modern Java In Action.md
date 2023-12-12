@@ -47,7 +47,7 @@
     }
     ```
     
-    ![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled.png)
+    ![Untitled](./photo//Untitled.png)
     
 8. **동작 파라미터화를 기억하라**
     1. 위의 코드는 파일에서 한 번에 한 줄만 읽을 수 있다. 
