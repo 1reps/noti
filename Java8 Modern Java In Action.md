@@ -71,7 +71,7 @@ public String processFile() throws IOException {
 }
 ```
 
-![Untitled](./photo/Untitled.png)
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled.png)
 
 ---
 
@@ -446,9 +446,555 @@ List<String> str = Arrays.asList("a", "b", "A", "B");
 str.sort((s1, s2) -> s1.compareToIgnoreCase(s2));
 ```
 
-![Untitled](./photo/Untitled%201.png)
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%201.png)
 
 ```java
 List<String> str = Arrays.asList("a", "b", "A", "B");
 str.sort(String::compareToIgnoreCase);
+```
+
+---
+
+### 생성자 참조
+
+ClassName::new처럼 클래스명과 new 키워드를 이용해서 기존 생성자의 참조를 만들 수 있다.
+
+```java
+Supplier<Apple> c1 = Apple::new;
+Apple a1 = c1.get() // Supplier의 get 메서드를 호출해서 새로운 Apple 객체를 만들 수 있다.
+// 위 예제와 다음 코드와 같다.
+Supplier<Apple> c1 = () -> new Apple(); // 람다 표현식은 디폴트 생성자를 가진 Apple을 만든다.
+Apple a1 = c1.get(); // Supplier get 메서드를 호출해서 새로운 Apple 객체를 만들 수 있다.
+```
+
+Apple(Integer weight)라는 시그니처를 갖는 생성자는 Function 인터페이스의 시그니처와 같다.
+
+```java
+// Apple.class
+public Apple(int weight) {
+	this.weight = weight;
+}
+// Application.class
+// 방법1.
+Function<Integer, Apple> f1 = Apple::new; // Apple(Integer weight)의 생성자 참조
+Apple ap1 = f1.apply(110); // Function의 apply 메서드에 무게를 인수로 호출해서 새로운 Apple 객체를 만들 수 있다.
+// 방법2.
+Function<Integer, Apple> f2 = (weight) -> new Apple(weight); // 특정 무게의 사과를 만든다는 람다 표현식
+Apple ap2 = f2.apply(110); // Function의 apply 메서드에 무게를 인수로 호출해서 새로운 Apply 객체를 만들 수 있다.
+```
+
+다음 코드에서 Integer를 포함하는 리스트의 각 요소를 우리가 정의했던 map 같은 메서드를 이용해서 Apple 생성자로 전달한다.
+
+결과적으로 다양한 무게를 포함하는 사과 리스트가 만들어진다.
+
+```java
+List<Integer> weights = Arrays.asList(7, 3, 4, 10);
+List<Apple> apples = map(weights, Apple::new);
+
+public static List<Apple> map(List<Integer> list, Function<Integer, Apple> f) {
+    List<Apple> result = new ArrayList<>();
+    for (Integer i : list) {
+        result.add(f.apply(i));
+    }
+    return result;
+}
+```
+
+Apple(String color, Integer weight)처럼 두 인수를 갖는 생성자는 BiFunction 인터페이스와 같은 시그니처를 가지므로 다음처럼 할 수 있다.
+
+```java
+// Apple.class
+public Apple(String color, int weight) {
+	this.color = color;
+	this.weight = weight;
+}
+// 방법1.
+BiFunction<Color, Integer, Apple> c3 = Apple::new; // Apple(String color, Integer weight)의 생성자 참조
+Apple a3 = c3.apply(GREEN, 110); // BiFunction의 apply 메서드에 색과 무게를 인수로 제공해서 새로운 Apple 객체를 만들 수 있다.
+// 방법2.
+BiFunction<Color, Integer, Apple> c3 = (color, weight) -> new Apple(color, weight); // Apple(String color, Integer weight)의 생성자 참조
+Apple a3 = c3.apply(GREEN, 110); // BiFunction의 apply 메서드에 색과 무게를 인수로 제공해서 새로운 Apple 객체를 만들 수 있다.
+```
+
+인스턴스화하지 않고도 생성자에 접근할 수 있는 기능을 다양한 상황에 응용할 수 있다.
+
+예를들어 Map으로 생성자와 문자열값을 관련시킬 수 있다. 그리고 String과 Integer가 주어졌을 때 다양한 무게를 갖는 여러 종류의 과일을 만드는 giveMeFruit라는 메서드를 만들 수 있다.
+
+```java
+static Map<String, Function<Integer, Fruit>> map = new HashMap<>();
+static {
+	map.put("apple", Apple::new);
+	map.put("orange", Orange::new);
+  // 등등
+}
+public static Fruit giveMeFruit(String fruit, Integer weight) {
+	return map.get(fruit.toLowerCase())
+						.apply(weight);
+}
+```
+
+---
+
+### 람다, 메서드 참조 활용하기 (http://www.hanbit.co.kr/src/10202 소스 내려받기)
+
+```java
+inventory.sort(comparing(Apple::getWeight));
+```
+
+> **1단계 : 코드전달**
+> 
+
+자바 8의 List API에서 sort 메서드를 제공하므로 정렬 메서드를 직접 구현할 필요는 없다. 그런데 어떻게 sort 메서드에 정렬 전략을 전달할 수 있을까? sort 메서드는 다음과 같은 시그니처를 갖는다.
+
+```java
+void sort(Comparator<? super E> c)
+```
+
+이 코드는 Comparator 객체를 인수로 받아 두 사과를 비교한다. 이제 ‘sort의 동작은 파라미터화되었다’라고 말할 수 있다.
+
+즉, sort에 전달된 정렬 전략에 따라 sort의 동작이 달라질 것이다.
+
+```java
+public class AppleComparator implements Comparator<Apple> {
+	public int compare(Apple a1, Apple a2) {
+		return a1.getWeight().compareTo(a2.getWeight);
+	}
+}
+inventory.sort(new AppleComparator());
+```
+
+> **2단계 : 익명 클래스 사용**
+> 
+
+한 번만 사용할 Comparator를 위 코드처럼 구현하기 보다는 익명 클래스를 이용하는 것이 좋다.
+
+```java
+inventory.sort(new Comparator<Apple>() {
+	public int compare(Apple a1, Apple a2) {
+		return a1.getWeight.compareTo(a2.getWeight);
+	}
+})
+```
+
+> **3단계 : 람다 표현식 사용**
+> 
+
+추상 메서드의 시그니처(함수 디스크립터라 불림)는 람다 표현식의 시그니처를 정의한다.
+
+Comparator의 함수 디스크립터는 (T, T) → int다. 우리는 사과를 사용할것이므로 더 정확히는 (Apple, Apple) → int로 표현할 수 있다.
+
+```java
+inventory.sort((Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight));
+```
+
+자바 컴파일러는 람다 표현식이 사용된 콘텍스트를 활용해서 람다의 파라미터 형식을 추론한다고 설명했다.
+
+**따라서 코드를 더 줄일 수 있다.**
+
+```java
+inventory.sort((a1, a2) -> a1.getWeight().compareTo(a2.getWeight));
+```
+
+**가독성을 더 향상시켜보자.**
+
+Comparator는 Compareble 키를 추출해서 Comparator 객체로 만드는 Function 함수를 인수로 받는 정적 메서드 comparing을 포함한다.
+
+```java
+Comparator<Apple> c = Comparator.comparing((Apple a) -> a.getWeight());
+```
+
+간소화해보자.
+
+```java
+import static java.util.Comparator.comparing;
+// 방법1.
+inventory.sort(comparing(apple -> apple.getWeight()));
+// 방법2.
+inventory.sort(comparing(Apple::getWeight));
+```
+
+> **4단계 : 메서드 참조 사용**
+> 
+
+---
+
+### 람다 표현식을 조합할 수 있는 유용한 메서드
+
+자바 8에서 몇몇 함수형 인터페이스는 다양한 유틸리티 메서드를 포함한다.
+
+예를 들어 Comparator, Function, Predicate 같은 함수형 인터페이스는 람다 표현식을 조합할 수 있도록 유틸리티 메서드를 제공한다.
+
+**간단히 말해, 여러 개의 람다 표현식을 조합해서 복잡한 람다 표현식을 만들 수 있다는 것이다.**
+
+예를 들어 두 프리디케이트를 조합해서 두 프리디케이트 or 연산을 수행하는 커다란 프리디케이트를 만들 수 있다.
+
+**또한 한 함수의 결과가 다른 함수의 입력이 되도록 두 함수를 조합할 수도 있다.**
+
+여기서 등장하는 것이 바로 디폴트 메서드다.
+
+---
+
+### Comparator 조합
+
+정적 메서드 Comparator.comparing을 이용해서 비교에 사용할 키를 추출하는 Function 기반의 Comparator를 반환할 수 있다.
+
+### 역정렬
+
+사과의 무게를 내림차순으로 정렬하고 싶다면 어떻게 해야 할까? 다른 Comparator 인스턴스를 만들 필요가 없다.
+
+인터페이스 자체에서 주어진 비교자의 순서를 바꿔주는 reverse라는 디폴트 메서드를 제공하기 때문이다
+
+```java
+inventory.sort(comparing(Apple::getWeight).reversed()); // 무게를 내림차순으로 정렬
+```
+
+### Comparator 연결
+
+하지만 무게가 같은 사과가 존재한다면 어떻게 해야 할까?
+
+비교 결과를 더 다듬을 수 있는 두번째 Comparator를 만들 수 있다.
+
+예를 들어, 무게가 같다면 원산지 국가별로 사과를 정렬할 수 있다.
+
+```java
+inventory.sort(comparing(Apple::getWeight)
+				 .reversed() // 무게를 내림차순으로 정렬
+         .thenComparing(Apple::getCountry)); // 두 사과의 무게가 같다면 국가별로 정렬
+```
+
+### Predicate 조합
+
+Predicate 인터페이스는 복잡한 프레디케이트를 만들 수 있도록 negate, and, or 세 가지 메서드를 제공한다.
+
+```java
+Predicate<Apple> notRedApple = redApple.negate(); // 기존 프레디케이트 객체 redApple의 결과를 반전시킨 객체를 만든다.
+```
+
+또한 and 메서드를 이용해서 빨간색이면서 무거운 사과를 선택하도록 두 람다를 조합할 수 있다.
+
+```java
+Predicate<Apple> redAndHeavyApple 
+					= readApple.and(apple -> apple.getWeight() > 150); // 두 프레디케이터 연결 후 새로운 프레디케이트 객체를 만든다.
+```
+
+그뿐만 아니라 or을 이용해서 ‘빨간색이면서 무거운 사과 또는 그냥 녹색 사과 등 다양한 조건을 만들 수 있다.’
+
+```java
+Predicate<Apple> redAndHeavyAppleOrGreen
+				= readApple.and(apple -> apple.getWeight() > 150)
+					.or(apple -> GREEN.equals(a.getColor())); // 프레디케이트 메서드르 연결해서 복잡한 프레디케이트 객체를 만든다.
+```
+
+### Function 조합
+
+Function 인터페이스는 Function 인스턴스를 반환하는 andThen, compose 두 가지 디폴트 메서드를 제공한다.
+
+andThen 메서드는 주어진 함수를 먼저 적용한 결과를 다른 함수의 입력으로 전달하는 함수를 반환한다.
+
+```java
+Function<Integer, Integer> f = x -> x + 1;
+Function<Integer, Integer> g = x -> x * 2;
+Function<integer, Integer> h = f.andThen(g);
+int result = h.apply(1); // 4
+```
+
+compose 메서드는 인수로 주어진 함수를 먼저 실행한 다음에 그 결과를 외부 함수의 인수로 제공한다.
+
+f.andThen(g)에서 andThen 대신에 compose를 사용하면 g(f(x))가 아니라 f(g(x))라는 수식이 된다.
+
+```java
+Function<Integer, Integer> f = x -> x + 1;
+Function<Integer, Integer> g = x -> x * 2;
+Function<integer, Integer> h = f.compose(g);
+int result = h.apply(1); // 3
+```
+
+# 스트림 소개
+
+---
+
+### 스트림이란 무엇인가?
+
+```java
+List<Dish> lowcaloricDishes = new ArrayList<>();
+for (Dish dish: menu) {
+	if (dish.getCaloiries() < 400) {
+		lowCaloricDishes.add(dish);
+	}
+}
+Collections.sort(lowCaloricDishes, new Comparator<Dish>() {
+	public int compare(Dish dish1, Dish dish2) {
+		return Integer.compare(dish1.getCalories(), dish2.getCalories());
+	}
+});
+List<String> lowCaloricDishsName = new ArrayList<>();
+for (Dish dish: lowCaloricDishes) {
+	lowCaloricDishesName.add(dish.getName()); // 정렬된 리스트 처리하면서 요리 이름 선택
+}
+```
+
+```java
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+
+List<String> lowCaloricDishsName = 
+					menu.stream()
+							.filter(d -> d.getCalories() < 400)
+						  .sort(comparing(Dish::getCalories)
+							.map(Dish::getName)
+			        .collect(toList());
+// 병렬로 실행 시
+List<String> lowCaloricDishsName = 
+					menu.parallelStream()
+							.filter(d -> d.getCalories() < 400)
+						  .sort(comparing(Dish::getCalories)
+							.map(Dish::getName)
+			        .collect(toList());
+```
+
+parallelStream()을 호출했을 때 정확히 어떤 일이 일어날까? 얼마나 많은 스레드가 사용되는 걸까? 얼마나 성능이 좋을까?
+
+> 선언형으로 코드를 구현할 수 있다. 즉, 루프와 if 조건문 등의 제어 블록을 사용해서 어떻게 동작을 구현할지 지정할 필요 없이
+’저칼로리의 요리만 선택하라’ 같은 동작의 수행을 지정할 수 있다.
+> 
+
+filter (또는 sorted, map, collect) 같은 연산은 **고수준 빌딩 블록**으로 이루어져 있으므로 특정 스레딩 모델에 제한되지 않고 자유롭게 어떤 상황에서든 사용할 수 있다. 결과적으로 우리는 데이터 처리 과정을 병렬화하면서 스레드와 락을 걱정할 필요가 없다.
+
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%202.png)
+
+**스트림 API는 매우 비싼 연산이다.** 예를 들어 4, 5, 6장을 학습하고 나면 여러분은 다음과 같은 코드를 구현할 수 있게 된다.
+
+```java
+Map<Dish.Type, List<Dish>> dishesByType = 
+		menu.stream().collect(groupingBy(Dish::getType));
+// ...
+{
+	FISH=[prawns, salmon],
+	OTHER=[french fries, rice, season fruit, pizza],
+	MEAT=[pork, beef, chicken]
+}
+```
+
+### 딱 한 번만 탐색할 수 있다.
+
+반복자와 마찬가지로 스트림도 한 번만 탐색할 수 있다. 즉, 탐색된 스트림의 요소는 소비된다.
+
+다시 탐색을 위해서는 초기 데이터 소스에서 새로운 스트림을 만들어야 한다.
+
+```java
+List<String> title = Arrays.asList("Java8", "In", "Action");
+Stream<String> s = title.stream();
+s.forEach(System.out::println); // title의 각 단어를 출력
+s.forEach(System.out::println); // java.lang.illegalStateException: 스트림이 이미 소비되었거나 닫힘.
+```
+
+### 스트림 : 내부 반복
+
+```java
+List<String> highCaloricDishes = new ArrayList<>();
+Iterator<String> iterator = menu.iterator();
+while(iterator.hasNext()) {
+	Dish dish = iterator.next();
+	if (dish.getCalories() > 300) {
+		highCaloricDishes.add(d.getName());
+	}
+}
+// 스트림 리팩터림
+List<String> names = menu.stream()
+		.filter(dish -> dish.getCalories() > 300)
+		.map(Dish::getName)
+		.collect(toList());
+```
+
+### 중간 연산
+
+```java
+List<String> names =
+                menu.stream()
+                        .filter(dish -> {
+                            System.out.println("filtering: " + dish.getName());
+                            return dish.getCalories() > 300;
+                        })
+                        .map(dish -> {
+                            System.out.println("mapping: " + dish.getName());
+                            return dish.getName();
+                        })
+                        .limit(3)
+                        .collect(Collectors.toList());
+// System.out.println(names);
+// filtering: pork
+// mapping: pork
+// filtering: beef
+// mapping: beef
+// filtering: chicken
+// mapping: chicken
+// [pork, beef, chicken]
+```
+
+### 최종 연산
+
+```java
+long count = menu.stream()
+                .filter(d -> d.getCalories() > 300)
+                .distinct()
+                .limit(3)
+                .count();
+System.out.println(count); // 3
+```
+
+# 스트림 활용
+
+---
+
+다음은 데이터 컬렉션 반복을 명시적을 관리하는 외부 반복 코드다.
+
+```java
+List<Dish> befetarianDishes = new ArrayList<>();
+for (Dish d: menu) {
+	if (d.isVegetarian()) {
+		vegetarianDishes.add(d);
+	}
+}
+```
+
+명시적 반복 대신 filter와 collect 연산을 지원하는 스트림 API를 이용해서 데이터 컬렉션 반복을 내부적으로 처리할 수 있다.
+
+```java
+List<Dish> begetarianDishes = 
+	menu.stream()
+		.filter(Dish::isVegertarian)
+		.collect(Collectors.toList());
+```
+
+데이터를 어떻게 처리할지는 스트림 API가 관리하므로 편리하게 데이터 관련 작업을 할 수 있다.
+
+따라서 스트림 API 내부적으로 다양한 최적화가 이루어질 수 있다.
+
+스트림 API는 내부 반복 뿐 아니라 코드를 병렬로 실행할지 여부도 결정할 수 있다.
+
+# 스트림 슬라이싱
+
+---
+
+### 프레디케이트를 이용한 슬라이싱
+
+```java
+List<Dish> specialMenu = Arrays.asList(
+                new Dish("seasonal fruit", true, 120, Dish.Type.OTHER),
+                new Dish("prawns", false, 300, Dish.Type.FISH),
+                new Dish("rice", true, 350, Dish.Type.OTHER),
+                new Dish("chicken", false, 400, Dish.Type.MEAT),
+			          new Dish("french fries", true, 530, Dish.Type.OTHER)
+);
+
+List<Dish> filteredMenu = specialMenu.stream()
+        .filter(dish -> dish.getCalories() < 320)
+        .collect(Collectors.toList());
+System.out.println(filteredMenu); // [seasonal fruit, prawns]
+```
+
+filter 연산을 이용하면 전체 스트림을 반복하면서 각 요소에 프레디케이트를 적용하게 된다.
+
+따라서 **리스트가 이미 정렬되어있다는 사실**을 이용해 반복 작업을 중단할 수 있다.
+
+작은 리스트에서는 이와 같은 동작이 별거 아닌 것처럼 보일 수 있지만 
+아주 많은 요소를 포함하는 큰 스트림에서는 상당한 차이가 될 수 있다.
+
+**takeWhile 활용** 
+
+무한 스트림을 포함한 모든 스트림에 프레디케이트를 적용해 스트림을 슬라이스할 수 있다.
+
+```java
+List<Dish> sliceMenu1 = specialMenu.stream()
+        .takeWhile(dish -> dish.getCalories() < 320)
+        .collect(Collectors.toList());
+System.out.println(sliceMenu1); // [seasonal fruit, prawns]
+```
+
+**Dropwhile 활용**
+
+takeWhile과 정반대의 작업을 수행한다. 프레디케이트가 처음으로 거짓이 되는 지점까지 발견된 요소를 버린다.
+
+```java
+List<Dish> sliceMenu2 = specialMenu.stream()
+        .dropWhile(dish -> dish.getCalories() < 320)
+        .collect(Collectors.toList());
+System.out.println(sliceMenu1); // [rice, chicken, french fries]
+```
+
+### 요소 건너뛰기
+
+스트림은 처음 n개 요소를 제외한 스트림을 반환하는 skip(n) 메서드를 지원한다.
+
+limit(n)과 skip(n)은 상호 보완적인 연산을 수행한다.
+
+```java
+List<Dish> dishes = menu.stream()
+        .filter(d -> d.getCalories() > 300)
+        .skip(2)
+        .collect(Collectors.toList());
+System.out.println(dishes); // [chicken, french fries, rice, pizza, salmon]
+```
+
+# 매핑
+
+---
+
+### 스트림의 각 요소에 함수 적용하기
+
+인수로 제공된 함수는 각 요소에 적용되며 함수를 적용한 결과가 새로운 요소로 매핑된다.(’새로운 버전을 만든다’라는 개념에 가까움)
+
+```java
+List<String> words = Arrays.asList("Modern", "Java", "In", "Action");
+List<Integer> wordLengths = words.stream()
+        .map(String::length)
+        .collect(Collectors.toList());
+System.out.println(wordLengths); // [6, 4, 2, 6]
+```
+
+각 요리명의 길이를 알고 싶다면 어떻게 해야할까?
+
+다른 map 메서드를 연결(chaining)할 수 있다.
+
+```java
+List<Integer> dishNameLengths = menu.stream()
+        .map(Dish::getName)
+        .map(String::length)
+        .collect(Collectors.toList());
+System.out.println(dishNameLengths); // [4, 4, 7, 12, 4, 12, 5, 6, 6]
+```
+
+### 스트림 평면화
+
+예를 들어 [”Hello”, “World”] 리스트가 있다면 결과로 [”H”, “e”, “l”, “o”, “W”, “r”, “d”]를 포함하는 리스트가 반환되어야 한다.
+
+```java
+List<String> wordsStreamSplit = words2.stream()
+        .map(word -> word.split(""))
+        .flatMap(Arrays::stream)
+        .distinct()
+        .collect(Collectors.toList());
+System.out.println(wordsStreamSplit); // [H, e, l, o, W, r, d]
+```
+
+### map과 [Arrays.stream](http://Arrays.stream) 활용
+
+```java
+String[] arrayOfWords = {"Goodbye", "World"};
+Stream<String> streamOfWords = Arrays.stream(arrayOfWords);
+
+List<Stream<String>> mapStream = words.stream()
+        .map(word -> word.split("")) // 각 단어를 개별 문자열 배열로 변환
+        .map(Arrays::stream) // 각 배열을 별도의 스트림으로 생성
+        .distinct()
+        .collect(toList());
+System.out.println(mapStream);
+// 문제가 해결되지 않았다. 문제를 해결하려면 먼저 각 단어를 개별 문자열로 이루어진 배열로 만든 다음에 각 배열을 별도의 스트림으로 만들어야 한다.
+
+List<String> uniqueCharacters = words.stream()
+        .map(word -> word.split("")) // 각 단어를 개별 문자를 포함하는 배열로 변환
+        .flatMap(Arrays::stream) // 생성된 스트림을 하나의 스트림으로 평면화
+        .distinct()
+        .collect(toList());
+System.out.println(uniqueCharacters);
 ```
