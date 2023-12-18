@@ -71,7 +71,7 @@ public String processFile() throws IOException {
 }
 ```
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled.png)
+![Untitled](./images/Untitled.png)
 
 ---
 
@@ -446,7 +446,7 @@ List<String> str = Arrays.asList("a", "b", "A", "B");
 str.sort((s1, s2) -> s1.compareToIgnoreCase(s2));
 ```
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%201.png)
+![Untitled](./images/Untitled%201.png)
 
 ```java
 List<String> str = Arrays.asList("a", "b", "A", "B");
@@ -581,7 +581,7 @@ inventory.sort(new Comparator<Apple>() {
 
 추상 메서드의 시그니처(함수 디스크립터라 불림)는 람다 표현식의 시그니처를 정의한다.
 
-Comparator의 함수 디스크립터는 (T, T) → int다. 우리는 사과를 사용할것이므로 더 정확히는 (Apple, Apple) → int로 표현할 수 있다.
+***Comparator***의 함수 디스크립터는 (T, T) → int다. 우리는 사과를 사용할것이므로 더 정확히는 (Apple, Apple) → int로 표현할 수 있다.
 
 ```java
 inventory.sort((Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight));
@@ -597,7 +597,7 @@ inventory.sort((a1, a2) -> a1.getWeight().compareTo(a2.getWeight));
 
 **가독성을 더 향상시켜보자.**
 
-Comparator는 Compareble 키를 추출해서 Comparator 객체로 만드는 Function 함수를 인수로 받는 정적 메서드 comparing을 포함한다.
+***Comparator***는 ***Compareble*** 키를 추출해서 ***Comparator*** 객체로 만드는 ***Function*** 함수를 인수로 받는 정적 메서드 ***comparing***을 포함한다.
 
 ```java
 Comparator<Apple> c = Comparator.comparing((Apple a) -> a.getWeight());
@@ -622,7 +622,7 @@ inventory.sort(comparing(Apple::getWeight));
 
 자바 8에서 몇몇 함수형 인터페이스는 다양한 유틸리티 메서드를 포함한다.
 
-예를 들어 Comparator, Function, Predicate 같은 함수형 인터페이스는 람다 표현식을 조합할 수 있도록 유틸리티 메서드를 제공한다.
+예를 들어 ***Comparator, Function, Predicate*** 같은 함수형 인터페이스는 람다 표현식을 조합할 수 있도록 ***유틸리티 메서드***를 제공한다.
 
 **간단히 말해, 여러 개의 람다 표현식을 조합해서 복잡한 람다 표현식을 만들 수 있다는 것이다.**
 
@@ -662,9 +662,9 @@ inventory.sort(comparing(Apple::getWeight)
          .thenComparing(Apple::getCountry)); // 두 사과의 무게가 같다면 국가별로 정렬
 ```
 
-### Predicate 조합
+### ***Predicate*** 조합
 
-Predicate 인터페이스는 복잡한 프레디케이트를 만들 수 있도록 negate, and, or 세 가지 메서드를 제공한다.
+***Predicate 인터페이스***는 복잡한 프레디케이트를 만들 수 있도록 ***negate, and, or*** 세 가지 메서드를 제공한다.
 
 ```java
 Predicate<Apple> notRedApple = redApple.negate(); // 기존 프레디케이트 객체 redApple의 결과를 반전시킨 객체를 만든다.
@@ -685,11 +685,11 @@ Predicate<Apple> redAndHeavyAppleOrGreen
 					.or(apple -> GREEN.equals(a.getColor())); // 프레디케이트 메서드르 연결해서 복잡한 프레디케이트 객체를 만든다.
 ```
 
-### Function 조합
+### ***Function*** 조합
 
-Function 인터페이스는 Function 인스턴스를 반환하는 andThen, compose 두 가지 디폴트 메서드를 제공한다.
+***Function 인터페이스***는 ***Function 인스턴스***를 반환하는 ***andThen, compose*** 두 가지 ***디폴트 메서드***를 제공한다.
 
-andThen 메서드는 주어진 함수를 먼저 적용한 결과를 다른 함수의 입력으로 전달하는 함수를 반환한다.
+***andThen 메서드***는 주어진 함수를 먼저 적용한 결과를 다른 함수의 입력으로 전달하는 함수를 반환한다.
 
 ```java
 Function<Integer, Integer> f = x -> x + 1;
@@ -698,9 +698,9 @@ Function<integer, Integer> h = f.andThen(g);
 int result = h.apply(1); // 4
 ```
 
-compose 메서드는 인수로 주어진 함수를 먼저 실행한 다음에 그 결과를 외부 함수의 인수로 제공한다.
+***compose 메서드***는 인수로 주어진 함수를 먼저 실행한 다음에 그 결과를 외부 함수의 인수로 제공한다.
 
-f.andThen(g)에서 andThen 대신에 compose를 사용하면 g(f(x))가 아니라 f(g(x))라는 수식이 된다.
+***f.andThen(g)***에서 ***andThen*** 대신에 ***compose***를 사용하면 ***g(f(x))***가 아니라 ***f(g(x))***라는 수식이 된다.
 
 ```java
 Function<Integer, Integer> f = x -> x + 1;
@@ -752,15 +752,15 @@ List<String> lowCaloricDishsName =
 			        .collect(toList());
 ```
 
-parallelStream()을 호출했을 때 정확히 어떤 일이 일어날까? 얼마나 많은 스레드가 사용되는 걸까? 얼마나 성능이 좋을까?
+***parallelStream()***을 호출했을 때 정확히 어떤 일이 일어날까? 얼마나 많은 스레드가 사용되는 걸까? 얼마나 성능이 좋을까?
 
 > 선언형으로 코드를 구현할 수 있다. 즉, 루프와 if 조건문 등의 제어 블록을 사용해서 어떻게 동작을 구현할지 지정할 필요 없이
 ’저칼로리의 요리만 선택하라’ 같은 동작의 수행을 지정할 수 있다.
 > 
 
-filter (또는 sorted, map, collect) 같은 연산은 **고수준 빌딩 블록**으로 이루어져 있으므로 특정 스레딩 모델에 제한되지 않고 자유롭게 어떤 상황에서든 사용할 수 있다. 결과적으로 우리는 데이터 처리 과정을 병렬화하면서 스레드와 락을 걱정할 필요가 없다.
+***filter (또는 sorted, map, collect)*** 같은 연산은 **고수준 빌딩 블록**으로 이루어져 있으므로 특정 스레딩 모델에 제한되지 않고 자유롭게 어떤 상황에서든 사용할 수 있다. 결과적으로 우리는 데이터 처리 과정을 병렬화하면서 스레드와 락을 걱정할 필요가 없다.
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%202.png)
+![Untitled](./images/Untitled%202.png)
 
 **스트림 API는 매우 비싼 연산이다.** 예를 들어 4, 5, 6장을 학습하고 나면 여러분은 다음과 같은 코드를 구현할 수 있게 된다.
 
@@ -876,7 +876,7 @@ List<Dish> begetarianDishes =
 
 ---
 
-### 프레디케이트를 이용한 슬라이싱
+### ***프레디케이트를*** 이용한 ***슬라이싱***
 
 ```java
 List<Dish> specialMenu = Arrays.asList(
@@ -900,7 +900,7 @@ filter 연산을 이용하면 전체 스트림을 반복하면서 각 요소에 
 작은 리스트에서는 이와 같은 동작이 별거 아닌 것처럼 보일 수 있지만 
 아주 많은 요소를 포함하는 큰 스트림에서는 상당한 차이가 될 수 있다.
 
-**takeWhile 활용** 
+***takeWhile* 활용** 
 
 무한 스트림을 포함한 모든 스트림에 프레디케이트를 적용해 스트림을 슬라이스할 수 있다.
 
@@ -911,7 +911,7 @@ List<Dish> sliceMenu1 = specialMenu.stream()
 System.out.println(sliceMenu1); // [seasonal fruit, prawns]
 ```
 
-**Dropwhile 활용**
+***Dropwhile* 활용**
 
 takeWhile과 정반대의 작업을 수행한다. 프레디케이트가 처음으로 거짓이 되는 지점까지 발견된 요소를 버린다.
 
@@ -926,7 +926,7 @@ System.out.println(sliceMenu1); // [rice, chicken, french fries]
 
 스트림은 처음 n개 요소를 제외한 스트림을 반환하는 skip(n) 메서드를 지원한다.
 
-limit(n)과 skip(n)은 상호 보완적인 연산을 수행한다.
+***limit(n)***과 ***skip(n)***은 상호 보완적인 연산을 수행한다.
 
 ```java
 List<Dish> dishes = menu.stream()
@@ -947,54 +947,297 @@ System.out.println(dishes); // [chicken, french fries, rice, pizza, salmon]
 ```java
 List<String> words = Arrays.asList("Modern", "Java", "In", "Action");
 List<Integer> wordLengths = words.stream()
-        .map(String::length)
-        .collect(Collectors.toList());
+												        .map(String::length)
+												        .collect(Collectors.toList());
 System.out.println(wordLengths); // [6, 4, 2, 6]
 ```
 
 각 요리명의 길이를 알고 싶다면 어떻게 해야할까?
 
-다른 map 메서드를 연결(chaining)할 수 있다.
+다른 map 메서드를 ***연결(chaining)***할 수 있다.
 
 ```java
 List<Integer> dishNameLengths = menu.stream()
-        .map(Dish::getName)
-        .map(String::length)
-        .collect(Collectors.toList());
+													        .map(Dish::getName)
+													        .map(String::length)
+													        .collect(Collectors.toList());
 System.out.println(dishNameLengths); // [4, 4, 7, 12, 4, 12, 5, 6, 6]
 ```
 
-### 스트림 평면화
+### ***스트림 평면화***
 
 예를 들어 [”Hello”, “World”] 리스트가 있다면 결과로 [”H”, “e”, “l”, “o”, “W”, “r”, “d”]를 포함하는 리스트가 반환되어야 한다.
 
 ```java
 List<String> wordsStreamSplit = words2.stream()
-        .map(word -> word.split(""))
-        .flatMap(Arrays::stream)
-        .distinct()
-        .collect(Collectors.toList());
+													        .map(word -> word.split(""))
+													        .flatMap(Arrays::stream)
+													        .distinct()
+													        .collect(Collectors.toList());
 System.out.println(wordsStreamSplit); // [H, e, l, o, W, r, d]
 ```
 
-### map과 [Arrays.stream](http://Arrays.stream) 활용
+### ***map***과 ***Arrays.stream*** 활용
 
 ```java
 String[] arrayOfWords = {"Goodbye", "World"};
 Stream<String> streamOfWords = Arrays.stream(arrayOfWords);
 
 List<Stream<String>> mapStream = words.stream()
-        .map(word -> word.split("")) // 각 단어를 개별 문자열 배열로 변환
-        .map(Arrays::stream) // 각 배열을 별도의 스트림으로 생성
-        .distinct()
-        .collect(toList());
+														        .map(word -> word.split("")) // 각 단어를 개별 문자열 배열로 변환
+														        //.forEach(array -> System.out.println(Arrays.toString(array))); // [H, e, l, l, o] \n [W, o, r, l, d]
+														        .map(Arrays::stream) // 각 배열을 별도의 스트림으로 생성
+														        .distinct()
+														        .collect(toList());
 System.out.println(mapStream);
 // 문제가 해결되지 않았다. 문제를 해결하려면 먼저 각 단어를 개별 문자열로 이루어진 배열로 만든 다음에 각 배열을 별도의 스트림으로 만들어야 한다.
 
 List<String> uniqueCharacters = words.stream()
-        .map(word -> word.split("")) // 각 단어를 개별 문자를 포함하는 배열로 변환
-        .flatMap(Arrays::stream) // 생성된 스트림을 하나의 스트림으로 평면화
-        .distinct()
-        .collect(toList());
+													        .map(word -> word.split("")) // 각 단어를 개별 문자를 포함하는 배열로 변환
+													        .flatMap(Arrays::stream) // 생성된 스트림을 하나의 스트림으로 평면화
+													        .distinct()
+													        .collect(toList());
 System.out.println(uniqueCharacters);
+```
+
+연습문제
+
+```java
+List<Integer> number1 = Arrays.asList(1, 2, 3);
+List<Integer> number2 = Arrays.asList(4, 5);
+List<int[]> pairs = number1.stream()
+								        .flatMap(i -> number2.stream().map(j -> new int[]{i, j}))
+								        .collect(toList());
+pairs.forEach(pair -> System.out.println(Arrays.toString(pair))); 
+// List<Array>이기 때문에 System.out.println(pairs)를 하게되면 주소값이 나오게된다.
+// 실제 값을 보기위해서는 순회후 Arrays.toString()을 이용하면 된다.
+```
+
+# 검색과 매칭
+
+---
+
+검색하는 스트림 API는 ***allMatch. anyMatch, noneMatch, findFirst, findAny***  등 다양한 유틸리티 메서드를 제공한다.
+
+### ***anyMatch*** 적어도 한 요소와 일치하는지 확인
+
+```java
+if (menu.stream().anyMatch(Dish::isVegetarian)) {
+	System.out.println("The menu is (somewaht) vegetarian friendly!!");
+}
+```
+
+### ***allMatch*** 모든 요소가 주어진 프레디케이트와 일치하는지 검사
+
+```java
+boolean isHealthy = menu.stream()
+											.allMatch(dish -> dish.getCalories() < 1000);
+```
+
+### ***nonMatch*** 일치하는 요소가 없는지 확인
+
+```java
+boolean isHealthy = menu.stream()
+											.noneMatch(d -> d.getCalories() >= 1000);
+```
+
+***anyMath, allMatch, noneMatch*** 새 메서드는 ***스트림 쇼트서킷*** 기법, 즉 자바의 ***&&, ||***와 같은 연산을 활용한다.
+
+## 요소 검색
+
+***findAny*** 현재 스트림에서 임의의 요소를 반환한다. ***findAny*** 메서드를 다른 스트림과 연결해서 사용할 수 있다.
+
+```java
+Optional<Dish> dish = menu.stream()
+												.filter(Dish::isVegetarian)
+												.findAny();
+```
+
+### Optional이란?
+
+***Optional<T>*** 클래스(***java.util.Optional***)는 값의 존재나 부재 여부를 표현하는 컨테이너 클래스다.
+
+이전 예제에서 ***findAny***는 아무 요소도 반환하지 않을 수 있다.
+
+***null***은 쉽게 에러를 일으킬 수 있으므로 자바 8 라이브러리 설계자는 Optional<T>를 만들었다.
+
+- ***isPresent()***는 ***Optional***이 값을 포함하면 ***참(true)***을 반환하고, 값을 포함하지 않으면 ***거짓(false)***을 반환한다.
+- ***ifPresent(Consumer<T> block)***은 값이 있으면 주어진 블록을 실행한다. ***Consumer*** 함수형 인터페이스는 3장에서 설명했다.
+***Consumer*** 함수형 인터페이스에는 ***T*** 형식의 인수를 받으며 ***void***를 반환하는 람다를 전달할 수 있다.
+- ***T get()***은 값이 존재하면 값을 반환하고, 값이 없으면 ***NoSuchElementException***을 일으킨다.
+- ***T orElse(T other)***는 값이 있으면 값을 반환하고, 값이 없으면 ***기본값***을 반환한다.
+
+예를 들어 이전 예제의 ***Optional<Dish>***에서는 요리명이 ***null***인지 검사할 필요가 없었다.
+
+```java
+menu.stream()
+	.filter(Dish::isVegetarian)
+	.findAny()
+	.ifPresent(dish -> System.out.println(dish.getName()));
+```
+
+### 첫 번째 요소 찾기
+
+리스트 또는 정렬된 연속 데이터로부터 생성된 스트림처럼 일부 스트림에는 ***논리적인 아이템 순서***가 정해져 있을 수 있다.
+
+예를 들어 숫자 리스트에서 3으로 나누어떨어지는 첫 번째 제곱값을 반환하는 다음 코드를 살펴보자.
+
+```java
+List<Integer> someNumbers = Arrays.asList(1, 2, 3, 4, 5);
+Optional<Integer> firstSquareDivisibleByThree = someNumbers.stream()
+																													.map(n -> n * n) // [1, 4, 9, 16, 25]
+																													.filter(n -> n % 3 == 0) // [9]
+																													.findFirst(); // 9	
+```
+
+### ***findFirst***와 ***findAny***는 언제 사용하나?
+
+그런데 왜 ***findFirst***와 ***findAny*** 메서드가 모두 필요할까? 바로 ***병렬성*** 때문이다.
+
+병렬 실행에서는 첫 번째 요소를 찾기 어렵다.
+
+따라서 요소의 반환 순서가 상관없다면 ***병렬 스트림***에서는 제약이 적은 ***findAny***를 사용한다.
+
+### 리듀싱
+
+***리듀스연산***을 이용해서 ***‘메뉴의 모든 칼로리의 합계를 구하시오’***, ***‘메뉴에서 칼로리가 가장 높은 요리는?’*** 같이 스트림 요수를 조합해서 ***더 복잡한 질의를 표현***하는 방법을 설명한다.
+
+이러한 질의를 수행하려면 ***Integer 같은 결과가 나올 때까지*** 스트림의 ***모든 요소***를 ***반복적***으로 처리해야 한다.
+
+이런 질의를 리듀싱 연산(모든 스트림 요소를 처리해서 값으로 도출하는)이라고 한다.
+
+### 요소의 합
+
+***reduce***를 이용하면 애플리케이션의 ***반복된 패턴***을 ***추상화***할 수 있다.
+
+```java
+// 방법1.
+int sum = numbers.stream().reduce(0, (a, b) -> a + b);
+// 방법2. 메서드 참조
+int sum = numbers.stream().reduce(0, Integer::sum);
+```
+
+리듀스는 두 개의 인수를 갖는다. 
+
+- 초깃값 0
+- 두 요소를 조합해서 새로운 값을 만드는 ***BinaryOperator<T>***. 예제에서는 람다 표현식 ***(a, b) → a + b***를 사용했다.
+
+### 초깃값 없음
+
+***초깃값***을 받지 않도록 ***오버로드***된 ***reduce***도 있다. 그러나 이 ***reduce***는 ***Optional 객체***를 ***반환***한다.
+
+```java
+Optional<Integer> sum = numbers.stream().reduce((a, b) -> (a + b));
+```
+
+왜 ***Optional<Integer>***를 반환하는 걸까? 스트림에 ***아무 요소도 없는 상황***을 생각해보자. 초깃값이 없으므로 ***reduce***는 합계를 반환할 수 없다.
+
+### 최댓값과 최솟값
+
+- 초깃값
+- 스트림의 두 요소를 합쳐서 하나의 값으로 만드는 데 사용할 람다
+
+```java
+// 최댓값
+Optional<Integer> max = numbers.stream().reduce(Integer::max);
+// 최솟값
+Optional<Integer> min = numbers.stream().reduce(Integer::min);
+```
+
+### ***reduce*** 메서드의 ***장점***과 ***병렬화***
+
+기존의 단계적 반복으로 합계를 구하는 것과 ***reduce***를 이용해서 합계를 구하는 것은 어떠한 차이가 있을까?
+
+***reduce***를 이용하면 내부 반복이 ***추상화***되면서 ***내부 구현에서 병렬***로 ***reduce***를 실행할 수 있게 된다.
+
+반복적인 합계에서는 sum 변수를 공유해야 하므로 쉽게 병렬화하기 어렵다.
+
+***강제적으로 동기화***시키더라도 결국 ***병렬화***로 얻어야 할 이득이 스레드 간의 소모적인 경쟁 때문에 상쇄되어 버린다는 사실을 알게 될 것이다.
+
+사실 이 작업을 ***병렬화***하려면 ***입력을 분할***하고, ***분할된 입력***을 더한 다음에, 더한 값을 합쳐야 한다.
+
+![Untitled](./images/Untitled%203.png)
+
+### 실전 연습
+
+```java
+Trader raoul = new Trader("Raoul", "Cambridge");
+Trader mario = new Trader("Mario", "Milan");
+Trader alan = new Trader("Alan", "Cambridge");
+Trader brian = new Trader("Brian", "Cambridge");
+
+List<Transaction> transactionList = Arrays.asList(
+        new Transaction(brian, 2011, 300),
+        new Transaction(raoul, 2012, 1000),
+        new Transaction(raoul, 2011, 400),
+        new Transaction(mario, 2012, 710),
+        new Transaction(mario, 2012, 700),
+        new Transaction(alan, 2012, 950)
+);
+
+// 2011년에 일어난 모든 트랜잭션을 찾아 값을 오름차순으로 정리하시오.
+List<Transaction> tr2011 =
+        transactionList.stream()
+                .filter(item -> item.getYear() == 2011)
+                .sorted(comparing(Transaction::getValue))
+                .collect(toList());
+// System.out.println(tr2011);
+
+// 거래자가 근무하는 모든 도시를 중복 없이 나열하시오.
+List<String> cities =
+        transactionList.stream()
+                .map(item -> item.getTrader().getCity())
+                .distinct()
+                .collect(toList());
+// System.out.println(cities);
+
+// 케임브리지에서 근무하는 모든 거래자를 찾아서 이름순으로 정렬하시오.
+List<Trader> traders =
+        transactionList.stream()
+                .map(Transaction::getTrader)
+                .filter(trader -> "Cambridge".toLowerCase().equals(trader.getCity().toLowerCase()))
+                .distinct()
+                .sorted(comparing(Trader::getName))
+                .collect(toList());
+// System.out.println(traders);
+
+// 모든 거래자의 이름을 알파벳순으로 정렬해서 반환하시오.
+String traderStr =
+        transactionList.stream()
+                .map(Transaction::getTrader)
+                .map(Trader::getName)
+                .distinct()
+                .sorted()
+                .collect(joining());
+// System.out.println(traderStr);
+
+// 밀라노에 거래자가 있는가?
+boolean milanBased =
+        transactionList.stream()
+                .anyMatch(transaction -> "xx".toLowerCase()
+                        .equals(transaction.getTrader()
+                                .getCity()
+                                .toLowerCase()));
+// System.out.println(milanBased);
+
+// 케임브리지에서 거주하는 거래자의 모든 트랜잭션값을 출력하시오.
+transactionList.stream()
+        .filter(transaction -> "Cambridge".toLowerCase().equals(transaction.getTrader()
+                .getCity()
+                .toLowerCase()))
+        .map(Transaction::getValue)
+        .forEach(System.out::println);
+
+// 전체 트랜잭션 중 최댓값은 얼마인가?
+Optional<Integer> highestValue =
+        transactionList.stream()
+                .map(transaction -> transaction.getValue())
+                .reduce(Integer::max);
+// System.out.println(highestValue);
+
+// 전체 트랜잭션 중 최솟값은 얼마인가?
+Optional<Transaction> smallestTransaction =
+        transactionList.stream()
+                .min(comparing(Transaction::getValue));
+// System.out.println(smallestTransaction);
 ```
