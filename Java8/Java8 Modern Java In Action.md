@@ -1241,3 +1241,530 @@ Optional<Transaction> smallestTransaction =
                 .min(comparing(Transaction::getValue));
 // System.out.println(smallestTransaction);
 ```
+
+### 숫자형 스트림
+
+```java
+int calories = nemu.stream().map(Dish::getCalories).reduce(0, Integer::sum);
+```
+
+```java
+int calories = menu.stream().map(Dish::getCalories).sum(); // 불가능
+```
+
+### 기본형 특화 스트림
+
+스트림 API는 ***박싱 비용***을 피할 수 있도록 ***‘IntStream’, ‘DoubleStream’, ‘LongStream’***을 제공한다.
+
+각각의 인터페이스는 sum, max 등 리듀싱 연산 수행 메서드를 제공한다.
+
+### 숫자 스트림으로 매핑
+
+스트림을 특화 스트림으로 변활 때는 ***mapToInt, mapToDouble, mapToLong*** 세 가지 메서드를 가장 많이 사용한다.
+
+***map과 정확히 같은 기능을 수행***하지만, ***Stream<T>*** 대신 특화된 스트림을 반환한다.
+
+```java
+int calories = menu.stream().mapToInt(Dish::getCalories).sum();
+```
+
+### 객체 스트림으로 복원하기
+
+IntStream의 map 연산은 ***‘int를 인수로 받아서 int를 반환하는 람다(IntUnaryOperator)’***를 인수로 받는다.
+
+하지만 정수가 아닌 Dish 같은 다른 값을 반환하고 싶으면 어떻게 해야 할까?
+
+```java
+IntStream intStream = menu.stream().mapToInt(Dish::getCalories); // 스트림을 숫자 스트림으로 변환
+Stream<Integer> stream = intStream.boxed(); // 숫자 스트림을 스트림으로 변환
+```
+
+### 기본값 : OptionalInt
+
+***IntStream***에서 최댓값을 찾을 때는 0이라는 기본값 때문에 잘못된 결과가 도출 될 수 있다.
+
+스트림에 요소가 없는 상황과 실제 최댓값이 0인 상황을 어떻게 구별할 수 있을까?
+
+***Optional***을 ***Integer, String***등의 ***참조 형식***으로 파라미터화할 수 있다.
+
+또한 ***OptionalInt, OptionalDouble, OptionalLong*** 세 가지 기본형 특화 스트림 버전도 제공한다.
+
+예를 들어 다음처럼 OptionalInt를 이용해서 IntStream의 최갮값 요소를 찾을 수 있다.
+
+```java
+OptionalInt maxCalories = menu.stream().mapIntStream(Dish::getCalories).max();
+```
+
+이제 OptionalInt를 이용해서 최댓값이 없는 상황에 사용할 기본값을 명시적으로 정의할 수 있다.
+
+```java
+List<Integer> noMax = Arrays.asList();
+System.out.println(noMax); // [] 빈 배열이면
+
+OptionalInt optionalMax = noMax.stream().mapToInt(num -> num).max();
+System.out.println(optionalMax); // OptionalInt.empty
+
+int resultMax = optionalMax.orElse(1);
+System.out.println(resultMax); // 1
+```
+
+### 숫자 범위
+
+프로그램에서 특정 범위의 숫자를 이용해야 하는 상황이 자주 발생한다.
+
+자바 8의 IntStream과 LongStream에서는 range와 rangeClose라는 두 가지 정적 메서드를 제공한다.
+
+range 메서드는 시작값과 종료값이 결과에 포함되지 않는 반면
+
+rangeClose 메서드는 시작값과 종료값이 결과에 포함된다는 점이 다르다.
+
+```java
+IntStream evenNumbers = IntStream.rangeClosed(1, 100); // [1, 100]
+																.filter(n -> n % 2 == 0); // 1부터 100까지의 짝수 스트림
+```
+
+---
+
+### 숫자 스트림 활용 : 피타고라스 수
+
+피타고라스는 ***a * a + b * b = c * c*** 공식을 만족하는 세 개의 정수 (a, b, c)가 존재함을 발견했다.
+
+### 세 수 표현하기
+
+예를 들어 ***(3, 4, 5)***를 ***new int[] {3, 4, 5}***로 표현할 수 있다.
+
+### 좋은 필터링 조합
+
+***a * a + b * b***의 제곱근이 정수인지 확인할 수 있다.
+
+```java
+Math.sqrt(a*a + b*b) % 1 == 0;
+```
+
+이를 filter에 다음처럼 활용할 수 있다.
+
+```java
+filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
+```
+
+### 집합 생성
+
+```java
+stream.filter(b -> Math.sqrt(a*a + b*b) % 1 == 0).map(b -> new int[] {a, b (int) Math.sqrt(a*a + b*b)});
+```
+
+### b값 생성
+
+다음처럼 1부터 100까지의 b값을 생성할 수 있다.
+
+```java
+IntStream.rangeClosed(1, 100)
+				.filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
+				.boxed()
+				.map(b -> new int[]{a, b, (int) Math.sqrt(a*a + b*b)});
+```
+
+IntStream의 map 메서드는 스트림의 각 요소로 int가 반환될 것을 기대하지만 이는 우리가 원하는 연산이 아니다.
+
+개체값 스트림을 반환하는 IntStream의 mapToObj 메서드를 이용해서 이 코드를 재구현할 수 있다.
+
+```java
+IntStream.rangeClosed(1, 100)
+				.filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
+				.mapToObj(b -> new int[]{a, b, (int) Math.sqrt(a*a + b*b)});
+```
+
+### a값 생성
+
+마지막으로 a값을 생성하는 코드를 추가한다. b와 비슷한 방법으로 a값을 생성할 수 있다.
+
+```java
+Stream<int[]> pyrhagoreanTriples = 
+		IntStream.rangeClosed(1, 100).boxed()
+						 .flatMap(a -> 
+								IntStream.rangeClosed(a, 100)
+												 .filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
+                         .mapToObj(b ->
+															new int[] {a, b, (int) Math.sqrt(a*a + b*b)})
+							);
+```
+
+### 코드 실행
+
+```java
+pythagoreanTriples.limit(5)
+									.forEach(t -> 
+												System.out.println(t[0] + ", " + t[1] + ", " + t[2]));
+```
+
+### 개선할 점?
+
+현재 문제 해결 코드에서는 제곱근을 두 번 게산한다. 
+따라서 ***(a*a, b*b, a*a + b*b)*** 형식을 만족하는 세 수를 만든 다음에 우리가 원하는 조건에 맞는 결과만 필터링하는 것이 더 최적화된다.
+
+```java
+Stream<double[]> pythagoreanTriples2 =
+		IntStream.rangeClosed(1, 100).boxed()
+						 .flatMap(a -> IntStream.rangeClosed(a, 100)
+						 .mapToObj(
+								b -> new double[] {a, b, Math.sqrt(a*a + b*b)}) // 만들어진 세 수
+						 .filter(t -> t[2] % 1 == 0)); // 세 수 의 세번째 요소는 반드시 정수여야 한다.
+```
+
+# 스트림 만들기
+
+---
+
+### 값으로 스트림 만들기
+
+임의의 수를 인수로 받는 정적 메서드 ***Stream.of***를 이용해서 스트림을 만들 수 있다
+
+```java
+Stream<String> stream = Stram.of("Modern ", "Java", "In ", "Action");
+stream.map(String::toUpperCase).forEach(System.out::println);
+```
+
+다음처럼 ***empty*** 메서드를 이용해서 스트림을 비울 수 있다.
+
+```java
+Stream<String> emptyStream = Stream.empty();
+```
+
+### null이 될 수 있는 개체로 스트림 만들기
+
+자바 9에서는 null이 될 수 있는 개체를 스트림으로 만들 수 있는 새로운 메소드가 추가되었다.
+
+때로는 null이 될 수 있는 ***개체를 스트림(갹체가 null이라면 빈 스트림)***으로 만들어야 할 수 있다.
+
+예를 들어 ***System.getProperty***는 제공된 키에 대응하는 속성이 없으면 ***null***을 반환한다.
+
+이런 메소드를 스트림에 활용하려면 다음처럼 null을 명시적을 확인해야 했다.
+
+```java
+String homevalue = System.getProperty("home");
+Stream<String> homevalueStream = homeValue == null ? Stream.empty() : Stream.of(value);
+```
+
+***Stream.ofNullable***을 이용해 다음처럼 코드를 구현할 수있다.
+
+```java
+Stream<String> homeValueStream = Stream.ofNullable(System.getProperty("home"));
+```
+
+null이 될 수 있는 객체를 포함하는 스트림값을 flatMap과 함께 사용하는 상황에서는 이 패턴을 더 유용하게 사용할 수 있다.
+
+```java
+Stream<String> values = 
+		Stream.of("config", "home", "user")
+					.flatMap(key -> Stream.ofNullable(System.getProperty(key)));
+```
+
+### 배열로 스트림 만들기 ***(Arrays.stream)***
+
+```java
+int[] numbers = {2, 3, 5, 7, 11, 13};
+int sum = Arrays.stream(numbers).sum(); // 41
+```
+
+### 파일로 스트림 만들기
+
+파일을 처리하는 등의 I/O 연산에 사용하는 ***NIO API(비블록 I/O)***도 스트림 API를 활용할 수 있도록 업데이트되었다.
+
+***java.nio.file.Files***의 많은 정적 메서드가 스트림을 반환한다.
+
+```java
+long uniqueWords = 0;
+try (Stream<String> lines = 
+        Files.lines(Paths.get("data.txt"), Charset.defaultCharset())) {
+	uniqueWords = line.flatMap(line -> Arrays.stream(line.split(" ")))
+										.distinct()
+                    .count();
+} catch(IOException e) { ... }
+```
+
+## 함수로 무한 스트림 만들기
+
+---
+
+스트림 API는 함수에서 스트림을 만들 수 있는 두 정적 메서드 ***Stream.iterate***와 ***Stream.generate를*** 제공한다.
+
+두 연산을 이용해서 무한 스트림, 즉 고정된 컬렉션에서 고정된 크기로 스트림을 만들었던 것과는 달리
+
+***크기가 고정되지 않는 스트림***을 만들 수 있다. (하지만 무한한 값을 출력하지 않도록 limit(n) 함수를 함께 연결해서 사용한다.)
+
+### iterate 메서드
+
+```java
+Stream.iterate(0, n -> n + 2).limit(10).forEach(System.out::println);
+```
+
+### generate 메서드
+
+iterate와 달리 생산된 각 값을 연속적으로 계산하지 않는다.
+
+generate는 Supplier<T>를 인수로 받아서 새로운 값을 생산한다.
+
+```java
+Stream.generate(Math::random).limit(5).forEach(System.out::println);
+```
+
+generate를 어떤 상황에서 활용할 수 있을까?
+
+저장해두지 않는 사애가 없는 메서드 // 나중에 보기
+
+# CAPHTER 6. 스트림으로 데이터 수집
+
+---
+
+### 그룹핑 #1
+
+```java
+Map<Currency, List<Transaction>> transactionByCurrencies = new HashMap<>(); // 그룹핑 저장할 맵
+
+for (Transaction transaction : transactions) {
+	Currency currency = transaction.getCurrency();
+	List<Transaction> transactionForCurrency = transactionByCurrencies.get(currency);
+	
+	if (transactionsForCurrency == null) {
+		transactionsForCurrency = new ArrayList<>();
+		transactionsForCurrencies.put(currency, transactionsForCurrency);
+	}
+	transactionsForCurrency.add(transaction);
+} 
+```
+
+### 그룹핑 #2
+
+```java
+Map<Currency, List<Transaction>> transactionsByCurrencies = 
+		transactions.stream().collect(groupingBy(Tracnsaction::getCurrency));
+
+```
+
+## 컬렉터
+
+### 
+
+### 리듀싱 요약 ***(couning())***
+
+```java
+// 방법1
+long howManyDishes = menu.stream().collect(Collectors.counting());
+// 방법2
+long howManyDishes = menu.stream().count();
+```
+
+### 스트림값에서 최댓값과 최솟값 검색 ***(Collectors.maxBy, Collectors.minBy)***
+
+```java
+// 메뉴에서 칼로리가 가장 높은 요리 찾기!!
+Comparator<Dish> dishCaloriesComparator = Comparator.comparingInt(Dish::getCalories);
+Optional<Dish> mostCaloriesDish = menu.stream().collect(maxBy(dishCaloriesComparator));
+```
+
+### 요약 연산
+
+```java
+int totalCalories = menu.stream().collect(summingInt(Dish::getCalories));
+```
+
+```java
+double avgCalories = menu.stream().collect(averagingInt(Dish::getCalories));
+```
+
+```java
+IntSummaryStatistics menuStatistics = menu.stream().collect(sumarizingInt(Dish::getCalories));
+// 결과 : IntSummaryStatistics{count=0, sum=4300, min=120, average=477.7777778, max=800}
+```
+
+### 문자열 연결
+
+```java
+String shortMenu = menu.stream().map(Dish::getName).collect(joining(", ")); // pork, beef, ..., 
+```
+
+### 범용 리듀싱 요약 연산
+
+```java
+int totalCalrories = menu.stream().collect(reducing(0, Dish::getCalrories, (i, j) -> i + j));
+```
+
+### 응용
+
+```java
+Optional<Dish> mostCalorieDish = 
+		menu.stream().collect(reducing(
+					(d1, d2) -> d1.getCalories() > d2.getCalories() ? d1 : d2));
+```
+
+### collect와 reduce
+
+한 개의 인수를 갖는 reducing 컬렉터를 시작값이 없으므로 빈 스트림이 넘겨졌을 때 시작값이 설정되지 않는 상황이 벌어진다. (reducing은 Optional<DIsh> 객체를 반환한다.)
+
+```java
+Stream<Integer> stream = Arrays.asList(1, 2, 3, 4, 5, 6).stream();
+List<Integer> numbers = stream.reduce(
+												    new ArrayList<Integer>(), // 초기값
+												    (List<Integer> l, Integer e) -> {
+												        l.add(e);
+												        return l;
+												    },
+												    (List<Integer> l1, List<Integer> l2) -> {
+												        l1.addAll(l2);
+												        return l1;
+												    }
+												);
+```
+
+위 코드에는 의미론적인 문제와 실용적인 문제가 두 가지 발생한다.
+
+c***ollect 메서드는 결과를 누적하는 컨테이너를 바꾸도록 설계***된
+
+반면, reduce는 두 값을 하나로 도출하는 불변형 연산
+
+위 예제에서 ***reduce 메서드는 누적자로 사용된 리스트를 변환***시키므로 잘못 활용한 예이다.
+
+여러 스레드가 동시에 같은 데이터 구조체를 고치면 리스트 자체가 망가져버리므로 리듀싱 연산을 병렬로 수행할 수 없다.
+
+***병렬성을 확보하려면 collect 메서드로 리듀싱 연산을 구현하는 것이 바람직하다.***
+
+### 리듀싱으로 문자열 연결하기
+
+```java
+String shorMenu = menu.stream().map(Dish::getName).collect(joining());
+
+1. String shorMenu = menu.stream()
+							.map(Dish::getName)
+							.collect(reducing((s1, s2) -> s1 + s2)).get();
+2. String shorMenu = menu.stream()
+							.map(Dish::getName)
+							.collect(reducing("", Dish::getName, (s1, s2) -> s1 + s2).get();
+```
+
+### 그룹화
+
+```java
+Map<Dish.Type, List<Dish>> dishesByType = 
+		menu.stream().collect(groupingBy(Dish::getType)); 
+// {FISH=[prawns, salmon], OTHER={french fries, rice, season fruit, pizza}, MEAT=[port, beef, chicken]}
+
+// Dish 클래스에 분류 함수가 없기 때문에 메서드 참조가 불가능
+Map<CaloricLevel, List<Dish>> dishesByCaloricLevel = menu.stream().collect(
+		groupingBy(dish -> {
+			if (dish.getCalories() <= 400) return CaloricLevel.DIRET;
+			else if ....
+			else ...
+		})
+);
+```
+
+### 그룹화된 요소 조작
+
+```java
+// 방법1. 그룹핑 전 프리디케이트 조건 사용
+Map<Dish.Type, List<Dish>> caloricDishesByType = menu.stream()
+                .filter(dish -> dish.getCalories() > 500)
+                .collect(groupingBy(Dish::getType));
+System.out.println(caloricDishesByType); 
+// {MEAT=[pork, beef], OTHER=[french fries, pizza]} 
+// Fish는 프리디케이트에 해당하지 않아 키 자체가 사라짐
+
+// 방법2. 키가 없어지는 이슈 해결
+Map<Dish.Type, List<Dish>> caloricDishesByType = menu.stream()
+                .collect(groupingBy(Dish::getType,
+                        filtering(dish -> dish.getCalories() > 500, toList())));
+// System.out.println(caloricDishesByType); 
+// {OTHER={french fries, pizza}, MEAT=[port, beef], FISH=[]} 그룹핑 후 필터링
+```
+
+### 다수준 그룹화
+
+```java
+Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel =
+		menu.stream().collect(
+				groupingBy(Dish::getType,
+						groupingBy(dish -> {
+							if(dish.getCalories() <= 400) 
+								return CaloricLevel.DIRET;
+						})
+				)
+		);
+// {MEAT={DIET=[chicken], NORMAL=[beef], fAT=[pork .... ]}}
+```
+
+### 서브그룹으로 데이터 수집
+
+```java
+Map<Dish.Type, Long> typesCount = menu.stream()
+                .collect(groupingBy(Dish::getType, counting()));
+// System.out.println(typesCount); // {FISH=2, OTHER=4, MEAT=3}
+```
+
+<aside>
+💡 ***groupingBy(f)***는 사실 ***groupingBy(f, toList())***의 축약형이다.
+
+</aside>
+
+```java
+Map<Dish.Type, Optional<Dish>> mostCaloricByType = menu.stream()
+                .collect(groupingBy(Dish::getType,
+                        maxBy(comparing(Dish::getCalories))));
+// System.out.println(mostCaloricByType); {MEAT=Optional[pork], OTHER=Optional[pizza], FISH=Optional[salmon]}
+```
+
+<aside>
+💡 ***maxBy***가 생성하는 컬렉터의 결과 형식에 따라 맵의 값이 ***Optional*** 형식이 되었다.
+실제로 요리 중 ***Optional.empty()***를 값으로 갖는 요리는 존재하지 않는다.
+처음부터 존재하지 않는 요리는 맵에 추가되지 않기 때문이다.
+***groupingBy*** 컬렉터는 스트림의 첫 번째 요소를 찾은 이후에야 그룹화 맵에 새로운 키를 (게으르게) 추가한다.
+리듀싱 컬렉터가 반환하는 형식을 사용하는 상황이므로 굳이 ***optional*** 래퍼를 사용할 필요가 없다.
+
+</aside>
+
+### 컬렉터 결과를 다른 형식에 적용하기
+
+***Optional***로 감쌀 필요가 없으므로 ***Optional*** 삭제할 수 있다. 
+
+***Collectors.collectingAndThen***으로 반환한 결과를 다른형식으로 활용할 수 있다.
+
+```java
+Map<Dish.Type, Dish> mostCaloricByType2 = menu.stream()
+                .collect(groupingBy(Dish::getType,
+                        collectingAndThen(
+                                maxBy(comparingInt(Dish::getCalories)),
+				                        Optional::get)));
+System.out.println(mostCaloricByType2); // {MEAT=pork, FISH=salmon, OTHER=pizza}
+```
+
+### ***groupingBy***와 함께 사용하는 다른 컬렉터 예제
+
+```java
+Map<Dish.Type, Integer> totalCaloriesByType = menu.stream()
+                .collect(groupingBy(Dish::getType,
+                        summingInt(Dish::getCalories)));
+System.out.println(totalCaloriesByType); // {MEAT=1900, FISH=750, OTHER=1550}
+```
+
+```java
+Map<Dish.Type, Set<CaloricLevel>> sCollect = menu.stream()
+                .collect(groupingBy(Dish::getType,
+                        mapping(dish -> {
+                            if (dish.getCalories() <= 400) return CaloricLevel.DIET;
+                            else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
+                            else return CaloricLevel.FAT;
+                        }, toSet())));
+System.out.println(sCollect); // {MEAT=[FAT, DIET, NORMAL], FISH=[DIET, NORMAL], OTHER=[DIET, NORMAL]}
+```
+
+이전 예제에서는 ***Set***의 형식이 정해져 있지 않았다. 이때 ***toCollection***을 이용하면 원하는 방식으로 결과를 제어할 수 있다.
+
+```java
+Map<Dish.Type, HashSet<CaloricLevel>> caloricLevelByType = menu.stream()
+                .collect(groupingBy(Dish::getType, mapping(dish -> {
+                            if (dish.getCalories() <= 400) return CaloricLevel.DIET;
+                            else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
+                            else return CaloricLevel.FAT;
+                        },
+                        toCollection(HashSet::new))));
+System.out.println(caloricLevelByType); // {MEAT=[FAT, DIET, NORMAL], FISH=[DIET, NORMAL], OTHER=[DIET, NORMAL]}
+```
