@@ -2,7 +2,7 @@
 
 ---
 
-### 람다 표현식
+# CHPATER 3. 람다 표현식
 
 > **람다 표현식**은 메서드로 전달할 수 있는 익명 함수를 단순화한 것
 > 
@@ -71,7 +71,7 @@ public String processFile() throws IOException {
 }
 ```
 
-![Untitled](./images/Untitled.png)
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled.png)
 
 ---
 
@@ -288,10 +288,10 @@ String twoLines = processFile((BufferedReader br) -> br.readLine() + br.readLine
     List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
     
     List<Integer> squaredNumbers = numbers.stream()
-                                        .peek(x -> System.out.println("Before map: " + x))
-                                        .map(x -> x * x)
-                                        .peek(x -> System.out.println("After map: " + x))
-                                        .collect(Collectors.toList());
+                  .peek(x -> System.out.println("Before map: " + x))
+                  .map(x -> x * x)
+                  .peek(x -> System.out.println("After map: " + x))
+                  .collect(Collectors.toList());
     // Before map: 1
     // After map: 1
     // Before map: 2
@@ -309,8 +309,8 @@ String twoLines = processFile((BufferedReader br) -> br.readLine() + br.readLine
     List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
     
     List<Integer> squaredNumbers = numbers.stream()
-                                        .map(x -> x * x)
-                                        .collect(Collectors.toList()); 
+                .map(x -> x * x)
+                .collect(Collectors.toList()); 
     // [1, 4, 9, 16, 25]
     ```
     
@@ -446,7 +446,7 @@ List<String> str = Arrays.asList("a", "b", "A", "B");
 str.sort((s1, s2) -> s1.compareToIgnoreCase(s2));
 ```
 
-![Untitled](./images/Untitled%201.png)
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%201.png)
 
 ```java
 List<String> str = Arrays.asList("a", "b", "A", "B");
@@ -673,16 +673,17 @@ Predicate<Apple> notRedApple = redApple.negate(); // 기존 프레디케이트 �
 또한 and 메서드를 이용해서 빨간색이면서 무거운 사과를 선택하도록 두 람다를 조합할 수 있다.
 
 ```java
-Predicate<Apple> redAndHeavyApple 
-					= readApple.and(apple -> apple.getWeight() > 150); // 두 프레디케이터 연결 후 새로운 프레디케이트 객체를 만든다.
+Predicate<Apple> redAndHeavyApple = readApple.and(apple -> apple.getWeight() > 150); 
+// 두 프레디케이터 연결 후 새로운 프레디케이트 객체를 만든다.
 ```
 
 그뿐만 아니라 or을 이용해서 ‘빨간색이면서 무거운 사과 또는 그냥 녹색 사과 등 다양한 조건을 만들 수 있다.’
 
 ```java
-Predicate<Apple> redAndHeavyAppleOrGreen
-				= readApple.and(apple -> apple.getWeight() > 150)
-					.or(apple -> GREEN.equals(a.getColor())); // 프레디케이트 메서드르 연결해서 복잡한 프레디케이트 객체를 만든다.
+Predicate<Apple> redAndHeavyAppleOrGreen = readApple
+				.and(apple -> apple.getWeight() > 150)
+				.or(apple -> GREEN.equals(a.getColor())); 
+// 프레디케이트 메서드르 연결해서 복잡한 프레디케이트 객체를 만든다.
 ```
 
 ### ***Function*** 조합
@@ -709,7 +710,7 @@ Function<integer, Integer> h = f.compose(g);
 int result = h.apply(1); // 3
 ```
 
-# 스트림 소개
+# CAHPTER 4. 스트림 소개
 
 ---
 
@@ -737,15 +738,13 @@ for (Dish dish: lowCaloricDishes) {
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
-List<String> lowCaloricDishsName = 
-					menu.stream()
+List<String> lowCaloricDishsName = menu.stream()
 							.filter(d -> d.getCalories() < 400)
 						  .sort(comparing(Dish::getCalories)
 							.map(Dish::getName)
 			        .collect(toList());
 // 병렬로 실행 시
-List<String> lowCaloricDishsName = 
-					menu.parallelStream()
+List<String> lowCaloricDishsName = menu.parallelStream()
 							.filter(d -> d.getCalories() < 400)
 						  .sort(comparing(Dish::getCalories)
 							.map(Dish::getName)
@@ -760,7 +759,7 @@ List<String> lowCaloricDishsName =
 
 ***filter (또는 sorted, map, collect)*** 같은 연산은 **고수준 빌딩 블록**으로 이루어져 있으므로 특정 스레딩 모델에 제한되지 않고 자유롭게 어떤 상황에서든 사용할 수 있다. 결과적으로 우리는 데이터 처리 과정을 병렬화하면서 스레드와 락을 걱정할 필요가 없다.
 
-![Untitled](./images/Untitled%202.png)
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%202.png)
 
 **스트림 API는 매우 비싼 연산이다.** 예를 들어 4, 5, 6장을 학습하고 나면 여러분은 다음과 같은 코드를 구현할 수 있게 된다.
 
@@ -801,26 +800,25 @@ while(iterator.hasNext()) {
 }
 // 스트림 리팩터림
 List<String> names = menu.stream()
-		.filter(dish -> dish.getCalories() > 300)
-		.map(Dish::getName)
-		.collect(toList());
+						.filter(dish -> dish.getCalories() > 300)
+						.map(Dish::getName)
+						.collect(toList());
 ```
 
 ### 중간 연산
 
 ```java
-List<String> names =
-                menu.stream()
-                        .filter(dish -> {
-                            System.out.println("filtering: " + dish.getName());
-                            return dish.getCalories() > 300;
-                        })
-                        .map(dish -> {
-                            System.out.println("mapping: " + dish.getName());
-                            return dish.getName();
-                        })
-                        .limit(3)
-                        .collect(Collectors.toList());
+List<String> names = menu.stream()
+            .filter(dish -> {
+                System.out.println("filtering: " + dish.getName());
+                return dish.getCalories() > 300;
+            })
+            .map(dish -> {
+                System.out.println("mapping: " + dish.getName());
+                return dish.getName();
+            })
+            .limit(3)
+            .collect(Collectors.toList());
 // System.out.println(names);
 // filtering: pork
 // mapping: pork
@@ -835,14 +833,14 @@ List<String> names =
 
 ```java
 long count = menu.stream()
-                .filter(d -> d.getCalories() > 300)
-                .distinct()
-                .limit(3)
-                .count();
+	        .filter(d -> d.getCalories() > 300)
+	        .distinct()
+	        .limit(3)
+	        .count();
 System.out.println(count); // 3
 ```
 
-# 스트림 활용
+# CAHPTER 5. 스트림 활용
 
 ---
 
@@ -860,10 +858,9 @@ for (Dish d: menu) {
 명시적 반복 대신 filter와 collect 연산을 지원하는 스트림 API를 이용해서 데이터 컬렉션 반복을 내부적으로 처리할 수 있다.
 
 ```java
-List<Dish> begetarianDishes = 
-	menu.stream()
-		.filter(Dish::isVegertarian)
-		.collect(Collectors.toList());
+List<Dish> begetarianDishes = menu.stream()
+				.filter(Dish::isVegertarian)
+				.collect(Collectors.toList());
 ```
 
 데이터를 어떻게 처리할지는 스트림 API가 관리하므로 편리하게 데이터 관련 작업을 할 수 있다.
@@ -872,7 +869,7 @@ List<Dish> begetarianDishes =
 
 스트림 API는 내부 반복 뿐 아니라 코드를 병렬로 실행할지 여부도 결정할 수 있다.
 
-# 스트림 슬라이싱
+## 스트림 슬라이싱
 
 ---
 
@@ -930,13 +927,13 @@ System.out.println(sliceMenu1); // [rice, chicken, french fries]
 
 ```java
 List<Dish> dishes = menu.stream()
-        .filter(d -> d.getCalories() > 300)
-        .skip(2)
-        .collect(Collectors.toList());
+				.filter(d -> d.getCalories() > 300)
+				.skip(2)
+				.collect(Collectors.toList());
 System.out.println(dishes); // [chicken, french fries, rice, pizza, salmon]
 ```
 
-# 매핑
+## 매핑
 
 ---
 
@@ -947,8 +944,8 @@ System.out.println(dishes); // [chicken, french fries, rice, pizza, salmon]
 ```java
 List<String> words = Arrays.asList("Modern", "Java", "In", "Action");
 List<Integer> wordLengths = words.stream()
-												        .map(String::length)
-												        .collect(Collectors.toList());
+				        .map(String::length)
+				        .collect(Collectors.toList());
 System.out.println(wordLengths); // [6, 4, 2, 6]
 ```
 
@@ -958,9 +955,9 @@ System.out.println(wordLengths); // [6, 4, 2, 6]
 
 ```java
 List<Integer> dishNameLengths = menu.stream()
-													        .map(Dish::getName)
-													        .map(String::length)
-													        .collect(Collectors.toList());
+				        .map(Dish::getName)
+				        .map(String::length)
+				        .collect(Collectors.toList());
 System.out.println(dishNameLengths); // [4, 4, 7, 12, 4, 12, 5, 6, 6]
 ```
 
@@ -970,10 +967,10 @@ System.out.println(dishNameLengths); // [4, 4, 7, 12, 4, 12, 5, 6, 6]
 
 ```java
 List<String> wordsStreamSplit = words2.stream()
-													        .map(word -> word.split(""))
-													        .flatMap(Arrays::stream)
-													        .distinct()
-													        .collect(Collectors.toList());
+				        .map(word -> word.split(""))
+				        .flatMap(Arrays::stream)
+				        .distinct()
+				        .collect(Collectors.toList());
 System.out.println(wordsStreamSplit); // [H, e, l, o, W, r, d]
 ```
 
@@ -984,19 +981,19 @@ String[] arrayOfWords = {"Goodbye", "World"};
 Stream<String> streamOfWords = Arrays.stream(arrayOfWords);
 
 List<Stream<String>> mapStream = words.stream()
-														        .map(word -> word.split("")) // 각 단어를 개별 문자열 배열로 변환
-														        //.forEach(array -> System.out.println(Arrays.toString(array))); // [H, e, l, l, o] \n [W, o, r, l, d]
-														        .map(Arrays::stream) // 각 배열을 별도의 스트림으로 생성
-														        .distinct()
-														        .collect(toList());
+				        .map(word -> word.split("")) // 각 단어를 개별 문자열 배열로 변환
+				        //.forEach(array -> System.out.println(Arrays.toString(array))); // [H, e, l, l, o] \n [W, o, r, l, d]
+				        .map(Arrays::stream) // 각 배열을 별도의 스트림으로 생성
+				        .distinct()
+				        .collect(toList());
 System.out.println(mapStream);
 // 문제가 해결되지 않았다. 문제를 해결하려면 먼저 각 단어를 개별 문자열로 이루어진 배열로 만든 다음에 각 배열을 별도의 스트림으로 만들어야 한다.
 
 List<String> uniqueCharacters = words.stream()
-													        .map(word -> word.split("")) // 각 단어를 개별 문자를 포함하는 배열로 변환
-													        .flatMap(Arrays::stream) // 생성된 스트림을 하나의 스트림으로 평면화
-													        .distinct()
-													        .collect(toList());
+				        .map(word -> word.split("")) // 각 단어를 개별 문자를 포함하는 배열로 변환
+				        .flatMap(Arrays::stream) // 생성된 스트림을 하나의 스트림으로 평면화
+				        .distinct()
+				        .collect(toList());
 System.out.println(uniqueCharacters);
 ```
 
@@ -1005,15 +1002,13 @@ System.out.println(uniqueCharacters);
 ```java
 List<Integer> number1 = Arrays.asList(1, 2, 3);
 List<Integer> number2 = Arrays.asList(4, 5);
-List<int[]> pairs = number1.stream()
-								        .flatMap(i -> number2.stream().map(j -> new int[]{i, j}))
-								        .collect(toList());
+List<int[]> pairs = number1.stream().flatMap(i -> number2.stream().map(j -> new int[]{i, j})).collect(toList());
 pairs.forEach(pair -> System.out.println(Arrays.toString(pair))); 
 // List<Array>이기 때문에 System.out.println(pairs)를 하게되면 주소값이 나오게된다.
 // 실제 값을 보기위해서는 순회후 Arrays.toString()을 이용하면 된다.
 ```
 
-# 검색과 매칭
+## 검색과 매칭
 
 ---
 
@@ -1030,15 +1025,13 @@ if (menu.stream().anyMatch(Dish::isVegetarian)) {
 ### ***allMatch*** 모든 요소가 주어진 프레디케이트와 일치하는지 검사
 
 ```java
-boolean isHealthy = menu.stream()
-											.allMatch(dish -> dish.getCalories() < 1000);
+boolean isHealthy = menu.stream().allMatch(dish -> dish.getCalories() < 1000);
 ```
 
 ### ***nonMatch*** 일치하는 요소가 없는지 확인
 
 ```java
-boolean isHealthy = menu.stream()
-											.noneMatch(d -> d.getCalories() >= 1000);
+boolean isHealthy = menu.stream().noneMatch(d -> d.getCalories() >= 1000);
 ```
 
 ***anyMath, allMatch, noneMatch*** 새 메서드는 ***스트림 쇼트서킷*** 기법, 즉 자바의 ***&&, ||***와 같은 연산을 활용한다.
@@ -1048,9 +1041,7 @@ boolean isHealthy = menu.stream()
 ***findAny*** 현재 스트림에서 임의의 요소를 반환한다. ***findAny*** 메서드를 다른 스트림과 연결해서 사용할 수 있다.
 
 ```java
-Optional<Dish> dish = menu.stream()
-												.filter(Dish::isVegetarian)
-												.findAny();
+Optional<Dish> dish = menu.stream().filter(Dish::isVegetarian).findAny();
 ```
 
 ### Optional이란?
@@ -1085,9 +1076,9 @@ menu.stream()
 ```java
 List<Integer> someNumbers = Arrays.asList(1, 2, 3, 4, 5);
 Optional<Integer> firstSquareDivisibleByThree = someNumbers.stream()
-																													.map(n -> n * n) // [1, 4, 9, 16, 25]
-																													.filter(n -> n % 3 == 0) // [9]
-																													.findFirst(); // 9	
+						.map(n -> n * n) // [1, 4, 9, 16, 25]
+						.filter(n -> n % 3 == 0) // [9]
+						.findFirst(); // 9	
 ```
 
 ### ***findFirst***와 ***findAny***는 언제 사용하나?
@@ -1156,7 +1147,7 @@ Optional<Integer> min = numbers.stream().reduce(Integer::min);
 
 사실 이 작업을 ***병렬화***하려면 ***입력을 분할***하고, ***분할된 입력***을 더한 다음에, 더한 값을 합쳐야 한다.
 
-![Untitled](./images/Untitled%203.png)
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%203.png)
 
 ### 실전 연습
 
@@ -1176,48 +1167,43 @@ List<Transaction> transactionList = Arrays.asList(
 );
 
 // 2011년에 일어난 모든 트랜잭션을 찾아 값을 오름차순으로 정리하시오.
-List<Transaction> tr2011 =
-        transactionList.stream()
-                .filter(item -> item.getYear() == 2011)
-                .sorted(comparing(Transaction::getValue))
-                .collect(toList());
+List<Transaction> tr2011 = transactionList.stream()
+            .filter(item -> item.getYear() == 2011)
+            .sorted(comparing(Transaction::getValue))
+            .collect(toList());
 // System.out.println(tr2011);
 
 // 거래자가 근무하는 모든 도시를 중복 없이 나열하시오.
-List<String> cities =
-        transactionList.stream()
-                .map(item -> item.getTrader().getCity())
-                .distinct()
-                .collect(toList());
+List<String> cities = transactionList.stream()
+            .map(item -> item.getTrader().getCity())
+            .distinct()
+            .collect(toList());
 // System.out.println(cities);
 
 // 케임브리지에서 근무하는 모든 거래자를 찾아서 이름순으로 정렬하시오.
-List<Trader> traders =
-        transactionList.stream()
-                .map(Transaction::getTrader)
-                .filter(trader -> "Cambridge".toLowerCase().equals(trader.getCity().toLowerCase()))
-                .distinct()
-                .sorted(comparing(Trader::getName))
-                .collect(toList());
+List<Trader> traders = transactionList.stream()
+            .map(Transaction::getTrader)
+            .filter(trader -> "Cambridge".toLowerCase().equals(trader.getCity().toLowerCase()))
+            .distinct()
+            .sorted(comparing(Trader::getName))
+            .collect(toList());
 // System.out.println(traders);
 
 // 모든 거래자의 이름을 알파벳순으로 정렬해서 반환하시오.
-String traderStr =
-        transactionList.stream()
-                .map(Transaction::getTrader)
-                .map(Trader::getName)
-                .distinct()
-                .sorted()
-                .collect(joining());
+String traderStr = transactionList.stream()
+            .map(Transaction::getTrader)
+            .map(Trader::getName)
+            .distinct()
+            .sorted()
+            .collect(joining());
 // System.out.println(traderStr);
 
 // 밀라노에 거래자가 있는가?
-boolean milanBased =
-        transactionList.stream()
-                .anyMatch(transaction -> "xx".toLowerCase()
-                        .equals(transaction.getTrader()
-                                .getCity()
-                                .toLowerCase()));
+boolean milanBased = transactionList.stream()
+            .anyMatch(transaction -> "xx".toLowerCase()
+                    .equals(transaction.getTrader()
+                            .getCity()
+                            .toLowerCase()));
 // System.out.println(milanBased);
 
 // 케임브리지에서 거주하는 거래자의 모든 트랜잭션값을 출력하시오.
@@ -1229,16 +1215,14 @@ transactionList.stream()
         .forEach(System.out::println);
 
 // 전체 트랜잭션 중 최댓값은 얼마인가?
-Optional<Integer> highestValue =
-        transactionList.stream()
-                .map(transaction -> transaction.getValue())
-                .reduce(Integer::max);
+Optional<Integer> highestValue = transactionList.stream()
+            .map(transaction -> transaction.getValue())
+            .reduce(Integer::max);
 // System.out.println(highestValue);
 
 // 전체 트랜잭션 중 최솟값은 얼마인가?
-Optional<Transaction> smallestTransaction =
-        transactionList.stream()
-                .min(comparing(Transaction::getValue));
+Optional<Transaction> smallestTransaction = transactionList.stream()
+            .min(comparing(Transaction::getValue));
 // System.out.println(smallestTransaction);
 ```
 
@@ -1254,15 +1238,17 @@ int calories = menu.stream().map(Dish::getCalories).sum(); // 불가능
 
 ### 기본형 특화 스트림
 
-스트림 API는 ***박싱 비용***을 피할 수 있도록 ***‘IntStream’, ‘DoubleStream’, ‘LongStream’***을 제공한다.
-
-각각의 인터페이스는 sum, max 등 리듀싱 연산 수행 메서드를 제공한다.
+- 스트림 API는 ***박싱 비용***을 피할 수 있도록 ***‘IntStream’, ‘DoubleStream’, ‘LongStream’***을 제공한다.
+    
+    각각의 인터페이스는 sum, max 등 리듀싱 연산 수행 메서드를 제공한다.
+    
 
 ### 숫자 스트림으로 매핑
 
-스트림을 특화 스트림으로 변활 때는 ***mapToInt, mapToDouble, mapToLong*** 세 가지 메서드를 가장 많이 사용한다.
-
-***map과 정확히 같은 기능을 수행***하지만, ***Stream<T>*** 대신 특화된 스트림을 반환한다.
+- 스트림을 특화 스트림으로 변활 때는 ***mapToInt, mapToDouble, mapToLong*** 세 가지 메서드를 가장 많이 사용한다.
+    
+    ***map과 정확히 같은 기능을 수행***하지만, ***Stream<T>*** 대신 특화된 스트림을 반환한다.
+    
 
 ```java
 int calories = menu.stream().mapToInt(Dish::getCalories).sum();
@@ -1270,9 +1256,10 @@ int calories = menu.stream().mapToInt(Dish::getCalories).sum();
 
 ### 객체 스트림으로 복원하기
 
-IntStream의 map 연산은 ***‘int를 인수로 받아서 int를 반환하는 람다(IntUnaryOperator)’***를 인수로 받는다.
-
-하지만 정수가 아닌 Dish 같은 다른 값을 반환하고 싶으면 어떻게 해야 할까?
+- ***IntStream***의 ***map*** 연산은 ***‘int를 인수로 받아서 int를 반환하는 람다(IntUnaryOperator)’***를 인수로 받는다.
+    
+    하지만 정수가 아닌 Dish 같은 다른 값을 반환하고 싶으면 어떻게 해야 할까?
+    
 
 ```java
 IntStream intStream = menu.stream().mapToInt(Dish::getCalories); // 스트림을 숫자 스트림으로 변환
@@ -1281,21 +1268,22 @@ Stream<Integer> stream = intStream.boxed(); // 숫자 스트림을 스트림으�
 
 ### 기본값 : OptionalInt
 
-***IntStream***에서 최댓값을 찾을 때는 0이라는 기본값 때문에 잘못된 결과가 도출 될 수 있다.
+- ***IntStream***에서 최댓값을 찾을 때는 0이라는 기본값 때문에 잘못된 결과가 도출 될 수 있다.
+    
+    스트림에 요소가 없는 상황과 실제 최댓값이 0인 상황을 어떻게 구별할 수 있을까?
+    
+    ***Optional***을 ***Integer, String***등의 ***참조 형식***으로 파라미터화할 수 있다.
+    
+    또한 ***OptionalInt, OptionalDouble, OptionalLong*** 세 가지 기본형 특화 스트림 버전도 제공한다.
+    
 
-스트림에 요소가 없는 상황과 실제 최댓값이 0인 상황을 어떻게 구별할 수 있을까?
-
-***Optional***을 ***Integer, String***등의 ***참조 형식***으로 파라미터화할 수 있다.
-
-또한 ***OptionalInt, OptionalDouble, OptionalLong*** 세 가지 기본형 특화 스트림 버전도 제공한다.
-
-예를 들어 다음처럼 OptionalInt를 이용해서 IntStream의 최갮값 요소를 찾을 수 있다.
+예를 들어 다음처럼 ***OptionalInt***를 이용해서 ***IntStream***의 최갮값 요소를 찾을 수 있다.
 
 ```java
 OptionalInt maxCalories = menu.stream().mapIntStream(Dish::getCalories).max();
 ```
 
-이제 OptionalInt를 이용해서 최댓값이 없는 상황에 사용할 기본값을 명시적으로 정의할 수 있다.
+이제 ***OptionalInt***를 이용해서 최댓값이 없는 상황에 사용할 기본값을 명시적으로 정의할 수 있다.
 
 ```java
 List<Integer> noMax = Arrays.asList();
@@ -1310,13 +1298,14 @@ System.out.println(resultMax); // 1
 
 ### 숫자 범위
 
-프로그램에서 특정 범위의 숫자를 이용해야 하는 상황이 자주 발생한다.
-
-자바 8의 IntStream과 LongStream에서는 range와 rangeClose라는 두 가지 정적 메서드를 제공한다.
-
-range 메서드는 시작값과 종료값이 결과에 포함되지 않는 반면
-
-rangeClose 메서드는 시작값과 종료값이 결과에 포함된다는 점이 다르다.
+- 프로그램에서 특정 범위의 숫자를 이용해야 하는 상황이 자주 발생한다.
+    
+    ***자바 8***의 ***IntStream***과 ***LongStream***에서는 ***range***와 ***rangeClose***라는 두 가지 정적 메서드를 제공한다.
+    
+    ***range*** 메서드는 시작값과 종료값이 결과에 포함되지 않는 반면
+    
+    ***rangeClose*** 메서드는 시작값과 종료값이 결과에 포함된다는 점이 다르다.
+    
 
 ```java
 IntStream evenNumbers = IntStream.rangeClosed(1, 100); // [1, 100]
@@ -1327,15 +1316,15 @@ IntStream evenNumbers = IntStream.rangeClosed(1, 100); // [1, 100]
 
 ### 숫자 스트림 활용 : 피타고라스 수
 
-피타고라스는 ***a * a + b * b = c * c*** 공식을 만족하는 세 개의 정수 (a, b, c)가 존재함을 발견했다.
+- 피타고라스는 ***a * a + b * b = c * c*** 공식을 만족하는 세 개의 정수 (a, b, c)가 존재함을 발견했다.
 
 ### 세 수 표현하기
 
-예를 들어 ***(3, 4, 5)***를 ***new int[] {3, 4, 5}***로 표현할 수 있다.
+- 예를 들어 ***(3, 4, 5)***를 ***new int[] {3, 4, 5}***로 표현할 수 있다.
 
 ### 좋은 필터링 조합
 
-***a * a + b * b***의 제곱근이 정수인지 확인할 수 있다.
+- ***a * a + b * b***의 제곱근이 정수인지 확인할 수 있다.
 
 ```java
 Math.sqrt(a*a + b*b) % 1 == 0;
@@ -1355,7 +1344,7 @@ stream.filter(b -> Math.sqrt(a*a + b*b) % 1 == 0).map(b -> new int[] {a, b (int)
 
 ### b값 생성
 
-다음처럼 1부터 100까지의 b값을 생성할 수 있다.
+- 다음처럼 1부터 100까지의 b값을 생성할 수 있다.
 
 ```java
 IntStream.rangeClosed(1, 100)
@@ -1364,9 +1353,10 @@ IntStream.rangeClosed(1, 100)
 				.map(b -> new int[]{a, b, (int) Math.sqrt(a*a + b*b)});
 ```
 
-IntStream의 map 메서드는 스트림의 각 요소로 int가 반환될 것을 기대하지만 이는 우리가 원하는 연산이 아니다.
-
-개체값 스트림을 반환하는 IntStream의 mapToObj 메서드를 이용해서 이 코드를 재구현할 수 있다.
+- ***IntStream***의 ***map*** 메서드는 스트림의 각 요소로 int가 반환될 것을 기대하지만 이는 우리가 원하는 연산이 아니다.
+    
+    개체값 스트림을 반환하는 ***IntStream***의 ***mapToObj*** 메서드를 이용해서 이 코드를 재구현할 수 있다.
+    
 
 ```java
 IntStream.rangeClosed(1, 100)
@@ -1376,7 +1366,7 @@ IntStream.rangeClosed(1, 100)
 
 ### a값 생성
 
-마지막으로 a값을 생성하는 코드를 추가한다. b와 비슷한 방법으로 a값을 생성할 수 있다.
+- 마지막으로 a값을 생성하는 코드를 추가한다. b와 비슷한 방법으로 a값을 생성할 수 있다.
 
 ```java
 Stream<int[]> pyrhagoreanTriples = 
@@ -1399,7 +1389,7 @@ pythagoreanTriples.limit(5)
 
 ### 개선할 점?
 
-현재 문제 해결 코드에서는 제곱근을 두 번 게산한다. 
+- 현재 문제 해결 코드에서는 제곱근을 두 번 계산한다. 
 따라서 ***(a*a, b*b, a*a + b*b)*** 형식을 만족하는 세 수를 만든 다음에 우리가 원하는 조건에 맞는 결과만 필터링하는 것이 더 최적화된다.
 
 ```java
@@ -1417,7 +1407,7 @@ Stream<double[]> pythagoreanTriples2 =
 
 ### 값으로 스트림 만들기
 
-임의의 수를 인수로 받는 정적 메서드 ***Stream.of***를 이용해서 스트림을 만들 수 있다
+- 임의의 수를 인수로 받는 정적 메서드 ***Stream.of***를 이용해서 스트림을 만들 수 있다
 
 ```java
 Stream<String> stream = Stram.of("Modern ", "Java", "In ", "Action");
@@ -1432,13 +1422,14 @@ Stream<String> emptyStream = Stream.empty();
 
 ### null이 될 수 있는 개체로 스트림 만들기
 
-자바 9에서는 null이 될 수 있는 개체를 스트림으로 만들 수 있는 새로운 메소드가 추가되었다.
-
-때로는 null이 될 수 있는 ***개체를 스트림(갹체가 null이라면 빈 스트림)***으로 만들어야 할 수 있다.
-
-예를 들어 ***System.getProperty***는 제공된 키에 대응하는 속성이 없으면 ***null***을 반환한다.
-
-이런 메소드를 스트림에 활용하려면 다음처럼 null을 명시적을 확인해야 했다.
+- ***자바 9***에서는 ***null***이 될 수 있는 개체를 스트림으로 만들 수 있는 새로운 메소드가 추가되었다.
+    
+    때로는 null이 될 수 있는 ***개체를 스트림(갹체가 null이라면 빈 스트림)***으로 만들어야 할 수 있다.
+    
+    예를 들어 ***System.getProperty***는 제공된 키에 대응하는 속성이 없으면 ***null***을 반환한다.
+    
+    이런 메소드를 스트림에 활용하려면 다음처럼 null을 명시적을 확인해야 했다.
+    
 
 ```java
 String homevalue = System.getProperty("home");
@@ -1451,7 +1442,7 @@ Stream<String> homevalueStream = homeValue == null ? Stream.empty() : Stream.of(
 Stream<String> homeValueStream = Stream.ofNullable(System.getProperty("home"));
 ```
 
-null이 될 수 있는 객체를 포함하는 스트림값을 flatMap과 함께 사용하는 상황에서는 이 패턴을 더 유용하게 사용할 수 있다.
+***null***이 될 수 있는 객체를 포함하는 스트림값을 ***flatMap***과 함께 사용하는 상황에서는 이 패턴을 더 유용하게 사용할 수 있다.
 
 ```java
 Stream<String> values = 
@@ -1468,9 +1459,10 @@ int sum = Arrays.stream(numbers).sum(); // 41
 
 ### 파일로 스트림 만들기
 
-파일을 처리하는 등의 I/O 연산에 사용하는 ***NIO API(비블록 I/O)***도 스트림 API를 활용할 수 있도록 업데이트되었다.
-
-***java.nio.file.Files***의 많은 정적 메서드가 스트림을 반환한다.
+- 파일을 처리하는 등의 I/O 연산에 사용하는 ***NIO API(비블록 I/O)***도 스트림 API를 활용할 수 있도록 업데이트되었다.
+    
+    ***java.nio.file.Files***의 많은 정적 메서드가 스트림을 반환한다.
+    
 
 ```java
 long uniqueWords = 0;
@@ -1486,11 +1478,12 @@ try (Stream<String> lines =
 
 ---
 
-스트림 API는 함수에서 스트림을 만들 수 있는 두 정적 메서드 ***Stream.iterate***와 ***Stream.generate를*** 제공한다.
-
-두 연산을 이용해서 무한 스트림, 즉 고정된 컬렉션에서 고정된 크기로 스트림을 만들었던 것과는 달리
-
-***크기가 고정되지 않는 스트림***을 만들 수 있다. (하지만 무한한 값을 출력하지 않도록 limit(n) 함수를 함께 연결해서 사용한다.)
+- 스트림 API는 함수에서 스트림을 만들 수 있는 두 정적 메서드 ***Stream.iterate***와 ***Stream.generate를*** 제공한다.
+    
+    두 연산을 이용해서 무한 스트림, 즉 고정된 컬렉션에서 고정된 크기로 스트림을 만들었던 것과는 달리
+    
+    ***크기가 고정되지 않는 스트림***을 만들 수 있다. (하지만 무한한 값을 출력하지 않도록 limit(n) 함수를 함께 연결해서 사용한다.)
+    
 
 ### iterate 메서드
 
@@ -1500,15 +1493,16 @@ Stream.iterate(0, n -> n + 2).limit(10).forEach(System.out::println);
 
 ### generate 메서드
 
-iterate와 달리 생산된 각 값을 연속적으로 계산하지 않는다.
-
-generate는 Supplier<T>를 인수로 받아서 새로운 값을 생산한다.
+- ***iterate***와 달리 생산된 각 값을 연속적으로 계산하지 않는다.
+    
+    ***generate***는 ***Supplier<T>***를 인수로 받아서 새로운 값을 생산한다.
+    
 
 ```java
 Stream.generate(Math::random).limit(5).forEach(System.out::println);
 ```
 
-generate를 어떤 상황에서 활용할 수 있을까?
+***generate***를 어떤 상황에서 활용할 수 있을까?
 
 저장해두지 않는 사애가 없는 메서드 // 나중에 보기
 
@@ -1536,14 +1530,12 @@ for (Transaction transaction : transactions) {
 ### 그룹핑 #2
 
 ```java
-Map<Currency, List<Transaction>> transactionsByCurrencies = 
-		transactions.stream().collect(groupingBy(Tracnsaction::getCurrency));
+Map<Currency, List<Transaction>> transactionsByCurrencies = transactions.stream()
+					.collect(groupingBy(Tracnsaction::getCurrency));
 
 ```
 
 ## 컬렉터
-
-### 
 
 ### 리듀싱 요약 ***(couning())***
 
@@ -1599,7 +1591,7 @@ Optional<Dish> mostCalorieDish =
 
 ### collect와 reduce
 
-한 개의 인수를 갖는 reducing 컬렉터를 시작값이 없으므로 빈 스트림이 넘겨졌을 때 시작값이 설정되지 않는 상황이 벌어진다. (reducing은 Optional<DIsh> 객체를 반환한다.)
+- 한 개의 인수를 갖는 ***reducing*** 컬렉터를 시작값이 없으므로 빈 스트림이 넘겨졌을 때 시작값이 설정되지 않는 상황이 벌어진다. (***reducing***은 ***Optional<DIsh>*** 객체를 반환한다.)
 
 ```java
 Stream<Integer> stream = Arrays.asList(1, 2, 3, 4, 5, 6).stream();
@@ -1616,17 +1608,18 @@ List<Integer> numbers = stream.reduce(
 												);
 ```
 
-위 코드에는 의미론적인 문제와 실용적인 문제가 두 가지 발생한다.
-
-c***ollect 메서드는 결과를 누적하는 컨테이너를 바꾸도록 설계***된
-
-반면, reduce는 두 값을 하나로 도출하는 불변형 연산
-
-위 예제에서 ***reduce 메서드는 누적자로 사용된 리스트를 변환***시키므로 잘못 활용한 예이다.
-
-여러 스레드가 동시에 같은 데이터 구조체를 고치면 리스트 자체가 망가져버리므로 리듀싱 연산을 병렬로 수행할 수 없다.
-
-***병렬성을 확보하려면 collect 메서드로 리듀싱 연산을 구현하는 것이 바람직하다.***
+- 위 코드에는 의미론적인 문제와 실용적인 문제가 두 가지 발생한다.
+    
+    c***ollect 메서드는 결과를 누적하는 컨테이너를 바꾸도록 설계***된
+    
+    반면, reduce는 두 값을 하나로 도출하는 불변형 연산
+    
+    위 예제에서 ***reduce 메서드는 누적자로 사용된 리스트를 변환***시키므로 잘못 활용한 예이다.
+    
+    여러 스레드가 동시에 같은 데이터 구조체를 고치면 리스트 자체가 망가져버리므로 리듀싱 연산을 병렬로 수행할 수 없다.
+    
+    ***병렬성을 확보하려면 collect 메서드로 리듀싱 연산을 구현하는 것이 바람직하다.***
+    
 
 ### 리듀싱으로 문자열 연결하기
 
@@ -1673,7 +1666,7 @@ System.out.println(caloricDishesByType);
 Map<Dish.Type, List<Dish>> caloricDishesByType = menu.stream()
                 .collect(groupingBy(Dish::getType,
                         filtering(dish -> dish.getCalories() > 500, toList())));
-// System.out.println(caloricDishesByType); 
+System.out.println(caloricDishesByType); 
 // {OTHER={french fries, pizza}, MEAT=[port, beef], FISH=[]} 그룹핑 후 필터링
 ```
 
@@ -1709,7 +1702,8 @@ Map<Dish.Type, Long> typesCount = menu.stream()
 Map<Dish.Type, Optional<Dish>> mostCaloricByType = menu.stream()
                 .collect(groupingBy(Dish::getType,
                         maxBy(comparing(Dish::getCalories))));
-// System.out.println(mostCaloricByType); {MEAT=Optional[pork], OTHER=Optional[pizza], FISH=Optional[salmon]}
+System.out.println(mostCaloricByType); 
+// {MEAT=Optional[pork], OTHER=Optional[pizza], FISH=Optional[salmon]}
 ```
 
 <aside>
@@ -1733,7 +1727,8 @@ Map<Dish.Type, Dish> mostCaloricByType2 = menu.stream()
                         collectingAndThen(
                                 maxBy(comparingInt(Dish::getCalories)),
 				                        Optional::get)));
-System.out.println(mostCaloricByType2); // {MEAT=pork, FISH=salmon, OTHER=pizza}
+System.out.println(mostCaloricByType2); 
+// {MEAT=pork, FISH=salmon, OTHER=pizza}
 ```
 
 ### ***groupingBy***와 함께 사용하는 다른 컬렉터 예제
@@ -1742,7 +1737,8 @@ System.out.println(mostCaloricByType2); // {MEAT=pork, FISH=salmon, OTHER=pizza}
 Map<Dish.Type, Integer> totalCaloriesByType = menu.stream()
                 .collect(groupingBy(Dish::getType,
                         summingInt(Dish::getCalories)));
-System.out.println(totalCaloriesByType); // {MEAT=1900, FISH=750, OTHER=1550}
+System.out.println(totalCaloriesByType); 
+// {MEAT=1900, FISH=750, OTHER=1550}
 ```
 
 ```java
@@ -1753,7 +1749,8 @@ Map<Dish.Type, Set<CaloricLevel>> sCollect = menu.stream()
                             else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
                             else return CaloricLevel.FAT;
                         }, toSet())));
-System.out.println(sCollect); // {MEAT=[FAT, DIET, NORMAL], FISH=[DIET, NORMAL], OTHER=[DIET, NORMAL]}
+System.out.println(sCollect); 
+// {MEAT=[FAT, DIET, NORMAL], FISH=[DIET, NORMAL], OTHER=[DIET, NORMAL]}
 ```
 
 이전 예제에서는 ***Set***의 형식이 정해져 있지 않았다. 이때 ***toCollection***을 이용하면 원하는 방식으로 결과를 제어할 수 있다.
@@ -1766,5 +1763,94 @@ Map<Dish.Type, HashSet<CaloricLevel>> caloricLevelByType = menu.stream()
                             else return CaloricLevel.FAT;
                         },
                         toCollection(HashSet::new))));
-System.out.println(caloricLevelByType); // {MEAT=[FAT, DIET, NORMAL], FISH=[DIET, NORMAL], OTHER=[DIET, NORMAL]}
+System.out.println(caloricLevelByType); 
+// {MEAT=[FAT, DIET, NORMAL], FISH=[DIET, NORMAL], OTHER=[DIET, NORMAL]}
 ```
+
+### 분할
+
+***분할 함수***는 불리언을 반환하므로 맵의 키 형식은 ***Boolean***이다.
+
+```java
+// boolean을 키로 갖는 그룹함수
+Map<Boolean, List<Dish>> partitionedMenu = menu.stream()
+                .collect(partitioningBy(Dish::isVegetarian));
+System.out.println(partitionedMenu); 
+// {false=[pork, beef, chicken, prawns, salmon], true=[french fries, rice, season fruit, pizza]}
+
+// 값 가져오기
+List<Dish> vegetarianDishes = partitionedMenu.get(true);
+System.out.println(vegetarianDishes); 
+// [french fries, rice, season fruit, pizza]
+```
+
+### 분할의 장점
+
+두 번째 인수로 전달할 수 있는 오버로드 된 버전의 ***partitioningBy*** 메서드
+
+```java
+Map<Boolean, Map<Dish.Type, List<Dish>>> vegetarianDishesByType = menu.stream()
+                .collect(
+                        partitioningBy(Dish::isVegetarian,
+                                groupingBy(Dish::getType)));
+System.out.println(vegetarianDishesByType);
+// {false={MEAT=[pork, beef, chicken], FISH=[prawns, salmon]}, true={OTHER=[french fries, rice , season fruit, pizza]}}
+```
+
+채식 요리와 채식이 아닌 요리 각각의 그룹에서 가장 칼로리가 높은 요리 찾기
+
+```java
+Map<Boolean, Dish> mostCaloricPartitionedByVegetarian = menu.stream()
+                .collect(
+                        partitioningBy(Dish::isVegetarian,
+                                collectingAndThen(maxBy(comparing(Dish::getCalories)),
+                                        Optional::get)));
+System.out.println(mostCaloricPartitionedByVegetarian);
+// {false=pork, true=pizza}
+```
+
+### 숫자를 소수와 비소수로 분할하기
+
+```java
+public boolean isPrime(int candidate) {
+	return IntStream.range(2, candidate).noneMatch(i -> candidate % i == 0); 
+	// 스트림의 모든 정수로 candidate를 나눌 수 없으면 참을 반환
+}
+```
+
+소수의 대상을 주어진 수의 제곱근 이하의 수로 제한할 수 있다.
+
+```java
+public boolean isPrime(int candidate) {
+	int candidateRoot = (int) Math.sqrt((double) candidate);
+	return InteStream.rangeClosed(2, candidateRoot).noneMatch(i -> candidate % i == 0);
+}
+```
+
+이렇게 만들어둔 프레디케이트로 소수와 비소수로 분류할 수 있다.
+
+```java
+public Map<Boolean, List<Integer>> partitionPrimes(int n) {
+	return IntStream.rangeClosed(2, n).boxed().collect(partitionBy(candidate -> isPrime(candidate)));
+}
+```
+
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%204.png)
+
+![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%205.png)
+
+# CHAPTER 7. 병렬 데이터 처리와 성능
+
+---
+
+# CHAPTER 11. null 대신 Optional 클래스
+
+---
+
+# CHAPTER 12. 새로운 날짜와 시간 API
+
+---
+
+# CHAPTER 13. 디폴트 메서드
+
+---
