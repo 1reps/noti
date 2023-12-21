@@ -24,7 +24,7 @@
 | 불리언 표현식 | (List<String> list) → list.isEmpty() |
 | --- | --- |
 | 객체 생성 | () → new Apple(10) |
-| 객체에서 소비 | (Apple a) → { sout(a.getWeight()) } |
+| 객체에서 소비 | (Apple a) → { System.out.println(a.getWeight()) } |
 | 객체에서 선택/추출 | (String s) → s.length() |
 | 두 값을 조합 | (int a, int b) → a * b |
 | 두 객체 비교 | (Apple a1, Apple a2) → a1.getWeight().compareTo(a2.getWeight()) |
@@ -54,7 +54,7 @@ process(() → System.out.println(”This is awesome!!”));
 > 
 
 > **FunctionalInterface**
-추상 메서드가 한 개 이상이라면 “Multiple nonoverriding abstract methos found in interface Foo”
+추상 메서드가 한 개 이상이라면 “Multiple overriding abstract methods found in interface Foo”
 > 
 
 ---
@@ -71,7 +71,7 @@ public String processFile() throws IOException {
 }
 ```
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled.png)
+![Untitled](./images/Untitled.png)
 
 ---
 
@@ -92,7 +92,7 @@ String result = processFile((BufferedReader br) → br.readLine() + br.readLine(
 ### **함수형 인터페이스를 이용해서 동작 전달**
 
 ```java
-@FuntionalInterface
+@FunctionalInterface
 public interface BufferedReaderProcessor {
 	String process(BufferedReader b) throws IOException;
 }
@@ -164,7 +164,7 @@ String twoLines = processFile((BufferedReader br) -> br.readLine() + br.readLine
     }
     forEach(
     	Arrays.asList(1,2,3,4,5),
-    	(Interger i) -> System.out.println(i) // Consumer의 accept 메서드를 구현하는 람다
+    	(Integer i) -> System.out.println(i) // Consumer의 accept 메서드를 구현하는 람다
     );
     ```
     
@@ -246,7 +246,7 @@ String twoLines = processFile((BufferedReader br) -> br.readLine() + br.readLine
     }
     BufferedReaderProcessor p = (BufferedReaderProcessor  br) -> br.readLine();
     // ... 예외 잡는 방법
-    Funtion<BufferedReader, String> f = (BufferedReader b) -> {
+    Function<BufferedReader, String> f = (BufferedReader b) -> {
     	try {
     		return b.readLine();
     	} catch(IOException e) {
@@ -337,7 +337,7 @@ String twoLines = processFile((BufferedReader br) -> br.readLine() + br.readLine
     > 
     
     ```java
-    List<Apple> greenAplles = filter(inventory, apple -> GREEN.equals(apple.getColor()));
+    List<Apple> greenApples = filter(inventory, apple -> GREEN.equals(apple.getColor()));
     ```
     
     > 여러 파라미터를 포함하는 람다 표현식에서는 코드 가독성 향상이 더 두드러진다.
@@ -446,7 +446,7 @@ List<String> str = Arrays.asList("a", "b", "A", "B");
 str.sort((s1, s2) -> s1.compareToIgnoreCase(s2));
 ```
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%201.png)
+![Untitled](./images/Untitled%201.png)
 
 ```java
 List<String> str = Arrays.asList("a", "b", "A", "B");
@@ -658,7 +658,7 @@ inventory.sort(comparing(Apple::getWeight).reversed()); // 무게를 내림차�
 
 ```java
 inventory.sort(comparing(Apple::getWeight)
-				 .reversed() // 무게를 내림차순으로 정렬
+         .reversed() // 무게를 내림차순으로 정렬
          .thenComparing(Apple::getCountry)); // 두 사과의 무게가 같다면 국가별로 정렬
 ```
 
@@ -717,9 +717,9 @@ int result = h.apply(1); // 3
 ### 스트림이란 무엇인가?
 
 ```java
-List<Dish> lowcaloricDishes = new ArrayList<>();
+List<Dish> lowCaloricDishes = new ArrayList<>();
 for (Dish dish: menu) {
-	if (dish.getCaloiries() < 400) {
+	if (dish.getCalories() < 400) {
 		lowCaloricDishes.add(dish);
 	}
 }
@@ -728,7 +728,7 @@ Collections.sort(lowCaloricDishes, new Comparator<Dish>() {
 		return Integer.compare(dish1.getCalories(), dish2.getCalories());
 	}
 });
-List<String> lowCaloricDishsName = new ArrayList<>();
+List<String> lowCaloricDishesName = new ArrayList<>();
 for (Dish dish: lowCaloricDishes) {
 	lowCaloricDishesName.add(dish.getName()); // 정렬된 리스트 처리하면서 요리 이름 선택
 }
@@ -738,13 +738,13 @@ for (Dish dish: lowCaloricDishes) {
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
-List<String> lowCaloricDishsName = menu.stream()
+List<String> lowCaloricDishesName = menu.stream()
 							.filter(d -> d.getCalories() < 400)
 						  .sort(comparing(Dish::getCalories)
 							.map(Dish::getName)
 			        .collect(toList());
 // 병렬로 실행 시
-List<String> lowCaloricDishsName = menu.parallelStream()
+List<String> lowCaloricDishesName = menu.parallelStream()
 							.filter(d -> d.getCalories() < 400)
 						  .sort(comparing(Dish::getCalories)
 							.map(Dish::getName)
@@ -759,7 +759,7 @@ List<String> lowCaloricDishsName = menu.parallelStream()
 
 ***filter (또는 sorted, map, collect)*** 같은 연산은 **고수준 빌딩 블록**으로 이루어져 있으므로 특정 스레딩 모델에 제한되지 않고 자유롭게 어떤 상황에서든 사용할 수 있다. 결과적으로 우리는 데이터 처리 과정을 병렬화하면서 스레드와 락을 걱정할 필요가 없다.
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%202.png)
+![Untitled](./images//Untitled%202.png)
 
 **스트림 API는 매우 비싼 연산이다.** 예를 들어 4, 5, 6장을 학습하고 나면 여러분은 다음과 같은 코드를 구현할 수 있게 된다.
 
@@ -847,7 +847,7 @@ System.out.println(count); // 3
 다음은 데이터 컬렉션 반복을 명시적을 관리하는 외부 반복 코드다.
 
 ```java
-List<Dish> befetarianDishes = new ArrayList<>();
+List<Dish> vegetarianDishes = new ArrayList<>();
 for (Dish d: menu) {
 	if (d.isVegetarian()) {
 		vegetarianDishes.add(d);
@@ -858,7 +858,7 @@ for (Dish d: menu) {
 명시적 반복 대신 filter와 collect 연산을 지원하는 스트림 API를 이용해서 데이터 컬렉션 반복을 내부적으로 처리할 수 있다.
 
 ```java
-List<Dish> begetarianDishes = menu.stream()
+List<Dish> vegetarianDishes = menu.stream()
 				.filter(Dish::isVegertarian)
 				.collect(Collectors.toList());
 ```
@@ -1147,7 +1147,7 @@ Optional<Integer> min = numbers.stream().reduce(Integer::min);
 
 사실 이 작업을 ***병렬화***하려면 ***입력을 분할***하고, ***분할된 입력***을 더한 다음에, 더한 값을 합쳐야 한다.
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%203.png)
+![Untitled](./images/Untitled%203.png)
 
 ### 실전 연습
 
@@ -1308,8 +1308,7 @@ System.out.println(resultMax); // 1
     
 
 ```java
-IntStream evenNumbers = IntStream.rangeClosed(1, 100); // [1, 100]
-																.filter(n -> n % 2 == 0); // 1부터 100까지의 짝수 스트림
+IntStream evenNumbers = IntStream.rangeClosed(1, 100).filter(n -> n % 2 == 0); // 1부터 100까지의 짝수 스트림
 ```
 
 ---
@@ -1348,9 +1347,9 @@ stream.filter(b -> Math.sqrt(a*a + b*b) % 1 == 0).map(b -> new int[] {a, b (int)
 
 ```java
 IntStream.rangeClosed(1, 100)
-				.filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
-				.boxed()
-				.map(b -> new int[]{a, b, (int) Math.sqrt(a*a + b*b)});
+		 .filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
+		 .boxed()
+		 .map(b -> new int[]{a, b, (int) Math.sqrt(a*a + b*b)});
 ```
 
 - ***IntStream***의 ***map*** 메서드는 스트림의 각 요소로 int가 반환될 것을 기대하지만 이는 우리가 원하는 연산이 아니다.
@@ -1360,8 +1359,8 @@ IntStream.rangeClosed(1, 100)
 
 ```java
 IntStream.rangeClosed(1, 100)
-				.filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
-				.mapToObj(b -> new int[]{a, b, (int) Math.sqrt(a*a + b*b)});
+         .filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
+		 .mapToObj(b -> new int[]{a, b, (int) Math.sqrt(a*a + b*b)});
 ```
 
 ### a값 생성
@@ -1369,22 +1368,17 @@ IntStream.rangeClosed(1, 100)
 - 마지막으로 a값을 생성하는 코드를 추가한다. b와 비슷한 방법으로 a값을 생성할 수 있다.
 
 ```java
-Stream<int[]> pyrhagoreanTriples = 
-		IntStream.rangeClosed(1, 100).boxed()
-						 .flatMap(a -> 
-								IntStream.rangeClosed(a, 100)
-												 .filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
-                         .mapToObj(b ->
-															new int[] {a, b, (int) Math.sqrt(a*a + b*b)})
-							);
+Stream<int[]> pythagoreanTriples = IntStream.rangeClosed(1, 100)
+    .boxed()
+    .flatMap(a -> IntStream.rangeClosed(a, 100)
+                           .filter(b -> Math.sqrt(a*a + b*b) % 1 == 0)
+                           .mapToObj(b ->new int[] {a, b, (int) Math.sqrt(a*a + b*b)}));
 ```
 
 ### 코드 실행
 
 ```java
-pythagoreanTriples.limit(5)
-									.forEach(t -> 
-												System.out.println(t[0] + ", " + t[1] + ", " + t[2]));
+pythagoreanTriples.limit(5).forEach(t -> System.out.println(t[0] + ", " + t[1] + ", " + t[2]));
 ```
 
 ### 개선할 점?
@@ -1393,12 +1387,12 @@ pythagoreanTriples.limit(5)
 따라서 ***(a*a, b*b, a*a + b*b)*** 형식을 만족하는 세 수를 만든 다음에 우리가 원하는 조건에 맞는 결과만 필터링하는 것이 더 최적화된다.
 
 ```java
-Stream<double[]> pythagoreanTriples2 =
-		IntStream.rangeClosed(1, 100).boxed()
-						 .flatMap(a -> IntStream.rangeClosed(a, 100)
-						 .mapToObj(
-								b -> new double[] {a, b, Math.sqrt(a*a + b*b)}) // 만들어진 세 수
-						 .filter(t -> t[2] % 1 == 0)); // 세 수 의 세번째 요소는 반드시 정수여야 한다.
+Stream<double[]> pythagoreanTriples2 = 
+    IntStream.rangeClosed(1, 100)
+             .boxed()
+             .flatMap(a -> IntStream.rangeClosed(a, 100)
+                                    .mapToObj(b -> new double[] {a, b, Math.sqrt(a*a + b*b)}) // 만들어진 세 수
+                                    .filter(t -> t[2] % 1 == 0)); // 세 수 의 세번째 요소는 반드시 정수여야 한다.
 ```
 
 # 스트림 만들기
@@ -1410,7 +1404,7 @@ Stream<double[]> pythagoreanTriples2 =
 - 임의의 수를 인수로 받는 정적 메서드 ***Stream.of***를 이용해서 스트림을 만들 수 있다
 
 ```java
-Stream<String> stream = Stram.of("Modern ", "Java", "In ", "Action");
+Stream<String> stream = Stream.of("Modern ", "Java", "In ", "Action");
 stream.map(String::toUpperCase).forEach(System.out::println);
 ```
 
@@ -1432,8 +1426,8 @@ Stream<String> emptyStream = Stream.empty();
     
 
 ```java
-String homevalue = System.getProperty("home");
-Stream<String> homevalueStream = homeValue == null ? Stream.empty() : Stream.of(value);
+String homeValue = System.getProperty("home");
+Stream<String> homeValueStream = homeValue == null ? Stream.empty() : Stream.of(value);
 ```
 
 ***Stream.ofNullable***을 이용해 다음처럼 코드를 구현할 수있다.
@@ -1445,9 +1439,8 @@ Stream<String> homeValueStream = Stream.ofNullable(System.getProperty("home"));
 ***null***이 될 수 있는 객체를 포함하는 스트림값을 ***flatMap***과 함께 사용하는 상황에서는 이 패턴을 더 유용하게 사용할 수 있다.
 
 ```java
-Stream<String> values = 
-		Stream.of("config", "home", "user")
-					.flatMap(key -> Stream.ofNullable(System.getProperty(key)));
+Stream<String> values = Stream.of("config", "home", "user")
+    .flatMap(key -> Stream.ofNullable(System.getProperty(key)));
 ```
 
 ### 배열로 스트림 만들기 ***(Arrays.stream)***
@@ -1466,10 +1459,9 @@ int sum = Arrays.stream(numbers).sum(); // 41
 
 ```java
 long uniqueWords = 0;
-try (Stream<String> lines = 
-        Files.lines(Paths.get("data.txt"), Charset.defaultCharset())) {
+try (Stream<String> lines = Files.lines(Paths.get("data.txt"), Charset.defaultCharset())) {
 	uniqueWords = line.flatMap(line -> Arrays.stream(line.split(" ")))
-										.distinct()
+                    .distinct()
                     .count();
 } catch(IOException e) { ... }
 ```
@@ -1565,7 +1557,7 @@ double avgCalories = menu.stream().collect(averagingInt(Dish::getCalories));
 ```
 
 ```java
-IntSummaryStatistics menuStatistics = menu.stream().collect(sumarizingInt(Dish::getCalories));
+IntSummaryStatistics menuStatistics = menu.stream().collect(summarizingInt(Dish::getCalories));
 // 결과 : IntSummaryStatistics{count=0, sum=4300, min=120, average=477.7777778, max=800}
 ```
 
@@ -1578,15 +1570,14 @@ String shortMenu = menu.stream().map(Dish::getName).collect(joining(", ")); // p
 ### 범용 리듀싱 요약 연산
 
 ```java
-int totalCalrories = menu.stream().collect(reducing(0, Dish::getCalrories, (i, j) -> i + j));
+int totalCalories = menu.stream().collect(reducing(0, Dish::getCalories, (i, j) -> i + j));
 ```
 
 ### 응용
 
 ```java
-Optional<Dish> mostCalorieDish = 
-		menu.stream().collect(reducing(
-					(d1, d2) -> d1.getCalories() > d2.getCalories() ? d1 : d2));
+Optional<Dish> mostCalorieDish = menu.stream()
+    .collect(reducing((d1, d2) -> d1.getCalories() > d2.getCalories() ? d1 : d2));
 ```
 
 ### collect와 reduce
@@ -1595,17 +1586,15 @@ Optional<Dish> mostCalorieDish =
 
 ```java
 Stream<Integer> stream = Arrays.asList(1, 2, 3, 4, 5, 6).stream();
-List<Integer> numbers = stream.reduce(
-												    new ArrayList<Integer>(), // 초기값
-												    (List<Integer> l, Integer e) -> {
-												        l.add(e);
-												        return l;
-												    },
-												    (List<Integer> l1, List<Integer> l2) -> {
-												        l1.addAll(l2);
-												        return l1;
-												    }
-												);
+List<Integer> numbers = stream.reduce(new ArrayList<Integer>(), 
+    (List<Integer> l, Integer e) -> {
+        l.add(e);
+        return l;
+    }, 
+	(List<Integer> l1, List<Integer> l2) -> {
+        l1.addAll(l2);
+		return l1;
+    });
 ```
 
 - 위 코드에는 의미론적인 문제와 실용적인 문제가 두 가지 발생한다.
@@ -1627,11 +1616,13 @@ List<Integer> numbers = stream.reduce(
 String shorMenu = menu.stream().map(Dish::getName).collect(joining());
 
 1. String shorMenu = menu.stream()
-							.map(Dish::getName)
-							.collect(reducing((s1, s2) -> s1 + s2)).get();
+    .map(Dish::getName)
+    .collect(reducing((s1, s2) -> s1 + s2))
+    .get();
 2. String shorMenu = menu.stream()
-							.map(Dish::getName)
-							.collect(reducing("", Dish::getName, (s1, s2) -> s1 + s2).get();
+    .map(Dish::getName)
+    .collect(reducing("", Dish::getName, (s1, s2) -> s1 + s2))
+    .get();
 ```
 
 ### 그룹화
@@ -1642,13 +1633,12 @@ Map<Dish.Type, List<Dish>> dishesByType =
 // {FISH=[prawns, salmon], OTHER={french fries, rice, season fruit, pizza}, MEAT=[port, beef, chicken]}
 
 // Dish 클래스에 분류 함수가 없기 때문에 메서드 참조가 불가능
-Map<CaloricLevel, List<Dish>> dishesByCaloricLevel = menu.stream().collect(
-		groupingBy(dish -> {
-			if (dish.getCalories() <= 400) return CaloricLevel.DIRET;
+Map<CaloricLevel, List<Dish>> dishesByCaloricLevel = menu.stream()
+    .collect(groupingBy(dish -> {
+			if (dish.getCalories() <= 400) return CaloricLevel.DIET;
 			else if ....
 			else ...
-		})
-);
+    }));
 ```
 
 ### 그룹화된 요소 조작
@@ -1656,16 +1646,15 @@ Map<CaloricLevel, List<Dish>> dishesByCaloricLevel = menu.stream().collect(
 ```java
 // 방법1. 그룹핑 전 프리디케이트 조건 사용
 Map<Dish.Type, List<Dish>> caloricDishesByType = menu.stream()
-                .filter(dish -> dish.getCalories() > 500)
-                .collect(groupingBy(Dish::getType));
+    .filter(dish -> dish.getCalories() > 500)
+    .collect(groupingBy(Dish::getType));
 System.out.println(caloricDishesByType); 
 // {MEAT=[pork, beef], OTHER=[french fries, pizza]} 
 // Fish는 프리디케이트에 해당하지 않아 키 자체가 사라짐
 
 // 방법2. 키가 없어지는 이슈 해결
 Map<Dish.Type, List<Dish>> caloricDishesByType = menu.stream()
-                .collect(groupingBy(Dish::getType,
-                        filtering(dish -> dish.getCalories() > 500, toList())));
+    .collect(groupingBy(Dish::getType, filtering(dish -> dish.getCalories() > 500, toList())));
 System.out.println(caloricDishesByType); 
 // {OTHER={french fries, pizza}, MEAT=[port, beef], FISH=[]} 그룹핑 후 필터링
 ```
@@ -1673,15 +1662,11 @@ System.out.println(caloricDishesByType);
 ### 다수준 그룹화
 
 ```java
-Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel =
-		menu.stream().collect(
-				groupingBy(Dish::getType,
-						groupingBy(dish -> {
-							if(dish.getCalories() <= 400) 
-								return CaloricLevel.DIRET;
-						})
-				)
-		);
+Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel = menu.stream()
+    .collect(groupingBy(Dish::getType, groupingBy(dish -> {
+                if(dish.getCalories() <= 400) 
+                    return CaloricLevel.DIET;
+                })));
 // {MEAT={DIET=[chicken], NORMAL=[beef], fAT=[pork .... ]}}
 ```
 
@@ -1689,7 +1674,7 @@ Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel =
 
 ```java
 Map<Dish.Type, Long> typesCount = menu.stream()
-                .collect(groupingBy(Dish::getType, counting()));
+    .collect(groupingBy(Dish::getType, counting()));
 // System.out.println(typesCount); // {FISH=2, OTHER=4, MEAT=3}
 ```
 
@@ -1700,8 +1685,7 @@ Map<Dish.Type, Long> typesCount = menu.stream()
 
 ```java
 Map<Dish.Type, Optional<Dish>> mostCaloricByType = menu.stream()
-                .collect(groupingBy(Dish::getType,
-                        maxBy(comparing(Dish::getCalories))));
+    .collect(groupingBy(Dish::getType, maxBy(comparing(Dish::getCalories))));
 System.out.println(mostCaloricByType); 
 // {MEAT=Optional[pork], OTHER=Optional[pizza], FISH=Optional[salmon]}
 ```
@@ -1723,10 +1707,7 @@ System.out.println(mostCaloricByType);
 
 ```java
 Map<Dish.Type, Dish> mostCaloricByType2 = menu.stream()
-                .collect(groupingBy(Dish::getType,
-                        collectingAndThen(
-                                maxBy(comparingInt(Dish::getCalories)),
-				                        Optional::get)));
+                .collect(groupingBy(Dish::getType, collectingAndThen(maxBy(comparingInt(Dish::getCalories)), Optional::get)));
 System.out.println(mostCaloricByType2); 
 // {MEAT=pork, FISH=salmon, OTHER=pizza}
 ```
@@ -1735,16 +1716,14 @@ System.out.println(mostCaloricByType2);
 
 ```java
 Map<Dish.Type, Integer> totalCaloriesByType = menu.stream()
-                .collect(groupingBy(Dish::getType,
-                        summingInt(Dish::getCalories)));
+    .collect(groupingBy(Dish::getType, summingInt(Dish::getCalories)));
 System.out.println(totalCaloriesByType); 
 // {MEAT=1900, FISH=750, OTHER=1550}
 ```
 
 ```java
 Map<Dish.Type, Set<CaloricLevel>> sCollect = menu.stream()
-                .collect(groupingBy(Dish::getType,
-                        mapping(dish -> {
+    .collect(groupingBy(Dish::getType, mapping(dish -> {
                             if (dish.getCalories() <= 400) return CaloricLevel.DIET;
                             else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
                             else return CaloricLevel.FAT;
@@ -1757,12 +1736,11 @@ System.out.println(sCollect);
 
 ```java
 Map<Dish.Type, HashSet<CaloricLevel>> caloricLevelByType = menu.stream()
-                .collect(groupingBy(Dish::getType, mapping(dish -> {
+    .collect(groupingBy(Dish::getType, mapping(dish -> {
                             if (dish.getCalories() <= 400) return CaloricLevel.DIET;
                             else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
                             else return CaloricLevel.FAT;
-                        },
-                        toCollection(HashSet::new))));
+                        }, toCollection(HashSet::new))));
 System.out.println(caloricLevelByType); 
 // {MEAT=[FAT, DIET, NORMAL], FISH=[DIET, NORMAL], OTHER=[DIET, NORMAL]}
 ```
@@ -1774,7 +1752,7 @@ System.out.println(caloricLevelByType);
 ```java
 // boolean을 키로 갖는 그룹함수
 Map<Boolean, List<Dish>> partitionedMenu = menu.stream()
-                .collect(partitioningBy(Dish::isVegetarian));
+    .collect(partitioningBy(Dish::isVegetarian));
 System.out.println(partitionedMenu); 
 // {false=[pork, beef, chicken, prawns, salmon], true=[french fries, rice, season fruit, pizza]}
 
@@ -1790,9 +1768,7 @@ System.out.println(vegetarianDishes);
 
 ```java
 Map<Boolean, Map<Dish.Type, List<Dish>>> vegetarianDishesByType = menu.stream()
-                .collect(
-                        partitioningBy(Dish::isVegetarian,
-                                groupingBy(Dish::getType)));
+    .collect(partitioningBy(Dish::isVegetarian, groupingBy(Dish::getType)));
 System.out.println(vegetarianDishesByType);
 // {false={MEAT=[pork, beef, chicken], FISH=[prawns, salmon]}, true={OTHER=[french fries, rice , season fruit, pizza]}}
 ```
@@ -1801,10 +1777,7 @@ System.out.println(vegetarianDishesByType);
 
 ```java
 Map<Boolean, Dish> mostCaloricPartitionedByVegetarian = menu.stream()
-                .collect(
-                        partitioningBy(Dish::isVegetarian,
-                                collectingAndThen(maxBy(comparing(Dish::getCalories)),
-                                        Optional::get)));
+    .collect(partitioningBy(Dish::isVegetarian, collectingAndThen(maxBy(comparing(Dish::getCalories)), Optional::get)));
 System.out.println(mostCaloricPartitionedByVegetarian);
 // {false=pork, true=pizza}
 ```
@@ -1835,9 +1808,9 @@ public Map<Boolean, List<Integer>> partitionPrimes(int n) {
 }
 ```
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%204.png)
+![Untitled](./images/Untitled%204.png)
 
-![Untitled](Java8%20Modern%20Java%20In%20Action%202af82249e8c54752a3c50e718b23ca09/Untitled%205.png)
+![Untitled](./images/Untitled%205.png)
 
 # CHAPTER 7. 병렬 데이터 처리와 성능
 
